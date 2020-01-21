@@ -20,6 +20,7 @@ Relax::Relax(vector<vector<double>> drawn_mesh, unordered_set<string> draw_u_set
 double Relax::relaxPotential(double p, double del, int max_iter){
 
      /*
+        p - relaxation parameter
         del - the required accuracy before stopping relaxation
         max_iter - a ceiling on hte number of iterations that can occur to give reasonable runtime 
     */
@@ -95,14 +96,18 @@ double Relax::relaxPotential(double p, double del, int max_iter){
 
 double Relax::getBestp(){
 
-    double best = 0;
+    double best_error = 0;
+    double best_p = 0;
 
     for(double p = 0; p <=2; p += 0.1){
         double error = relaxPotential(p,INT_MIN,10);
-        best = min(error, best);
+        if(best_error > error){
+            best_p = p;
+            best_error = error;
+        }
     }
 
-    return best;
+    return best_p;
 
 }
 
