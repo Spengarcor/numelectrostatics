@@ -15,7 +15,7 @@ Relax::Relax(vector<vector<double>> drawn_mesh, unordered_set<string> draw_u_set
         ignored_indices = draw_u_set;
 }
 
-
+//i was here
 
 double Relax::relaxPotential(double p, double del, int max_iter){
 
