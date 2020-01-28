@@ -13,7 +13,7 @@ class Relax{
     public:
 
         //constructor
-        Relax(std::vector<std::vector<double>>, std::unordered_set<std::string>);
+        Relax(std::vector<std::vector<double>>, std::vector<std::vector<bool>>);
 
 
         double getBestp();
@@ -27,7 +27,7 @@ class Relax{
     private:
 
         std::vector<std::vector<double>> mesh; 
-        std::unordered_set<std::string> ignored_indices;
+        std::vector<std::vector<bool>> change_indices;
 
 };
 

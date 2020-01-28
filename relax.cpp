@@ -7,15 +7,13 @@
 
 using namespace std;
 
-//Liam has committed
 
-Relax::Relax(vector<vector<double>> drawn_mesh, unordered_set<string> draw_u_set){
+Relax::Relax(vector<vector<double>> drawn_mesh, vector<vector<bool>> change_check){
 
         mesh = drawn_mesh;
-        ignored_indices = draw_u_set;
+        change_indices = change_check;
 }
 
-//i was here
 
 double Relax::relaxPotential(double p, double del, int max_iter){
 
@@ -29,7 +27,7 @@ double Relax::relaxPotential(double p, double del, int max_iter){
 
     //Need to know how big a change each step of relaxation causes 
     //so we can determine when to stop i.e. when diminished returns
-    double change = 2*del;
+    double change = 0; //CHANGE BACK TO 2*del
     int iter_count =0;
     int rows = mesh.size(), cols = mesh[0].size();
 
@@ -49,9 +47,9 @@ double Relax::relaxPotential(double p, double del, int max_iter){
         for(int i = 0; i != rows; ++i){ 
             for(int j = 0; j != cols; ++j){
             
-                //Our key is a pair with the coords of the square
+                
                 //Check if it is to be ignored or not before changing
-                if(ignored_indices.count(to_string(i) + " " + to_string(j)) == 0){
+                if(change_indices[i][j]){
 
                     //save original value for change calculation
                     double pot_orig = mesh[i][j];                
@@ -96,15 +94,19 @@ double Relax::relaxPotential(double p, double del, int max_iter){
 
 double Relax::getBestp(){
 
-    double best_error = 0;
+    double best_error = INT_MAX;
     double best_p = 0;
 
-    for(double p = 0; p <=2; p += 0.1){
+    vector<vector<double>> temp_copy = mesh;
+
+    for(double p = 0.1; p <=2; p += 0.1){
+        if(p > 1-0.001 && p < 1 +0.001) continue;
         double error = relaxPotential(p,INT_MIN,10);
         if(best_error > error){
             best_p = p;
             best_error = error;
         }
+        mesh = temp_copy;
     }
 
     return best_p;
