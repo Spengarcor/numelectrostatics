@@ -47,12 +47,13 @@ int main(){
     //use Grid object to draw shapes (initialise)
     Grid initialise(rows, cols);
 
-    initialise.circle(50,50,10, 10,10,0, true,true,false);
+    initialise.circle(50,50,25, 1,1,0, true,true,true);
+
+    initialise.circle(50,50,45, 1,1,1, false,true,false);
 
     vector<vector<double>> grid = initialise.get_mesh();
     vector<vector<bool>> change_check = initialise.get_change_indices();
 
-    save_to_csv(grid);
     
 
 
@@ -61,14 +62,18 @@ int main(){
 
 
 
-    //Relax solver(grid, change_check);
+    Relax solver(grid, change_check);
 
     //double bestp = solver.getBestp();
 
 
-    //solver.relaxPotential(bestp, 0.01, 1000);
+    solver.relaxPotential(0.5, 0.001, 10000);
 
 
+    vector<vector<double>> new_grid = solver.get_mesh();
+
+
+    save_to_csv(new_grid);
 
 
 
@@ -79,28 +84,3 @@ int main(){
 
 
 
-    // vector<vector<double>> grid(rows, vector<double>(cols));
-    // vector<vector<bool>> change_check(rows, vector<bool>(cols, true)); 
-
-    
-
-    // //initialise array -> change to calling draw methods using draw object
-    // for(int i = 0; i != rows; ++i){
-    //     for(int j = 0; j != cols; ++j){
-    //         //example 3.3 Griffiths
-
-    //         if(j == 0){
-                
-    //             grid[i][j] = 10; //V0 = 10V
-    //             change_check[i][j] = false;
-
-    //         } else if(i == 0 || i == rows - 1){
-
-    //             grid[i][j] = 0;
-    //             change_check[i][j] = false;
-
-    //         } else grid[i][j] = 0;
-
-
-    //     }
-    // }

@@ -54,12 +54,13 @@ void Grid::circle(int centre_x, int centre_y, float radius, double IN_CIRCLE,
         if(radius*radius>dist){
             if(IN_CIRCLE_FIX){
     	        mesh[i][j] = IN_CIRCLE; //CHANGE temp =10V for comparison
-                change_indices[i][j] = true;
+                change_indices[i][j] = false;
             }
         }
         else{
             if(OUT_CIRCLE_FIX){
-                change_indices[i][j] = true;
+                mesh[i][j] = OUT_CIRCLE;
+                change_indices[i][j] = OUT_CIRCLE_FIX;
             }
         }
 
@@ -75,7 +76,7 @@ void Grid::circle(int centre_x, int centre_y, float radius, double IN_CIRCLE,
 	      	fabs(i-centre_x))
 	         <=0.5){
       	    mesh[i][j] = BOUNDARY;
-            change_indices[i][j] = true;
+            change_indices[i][j] = false;
 	        }
         }
     }
