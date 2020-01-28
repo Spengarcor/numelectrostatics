@@ -1,6 +1,8 @@
 #include <iostream>
 #include <cmath>
 #include <vector>
+#include <map>
+#include <string>
 #include "circle.h"
 
 using namespace std;
@@ -33,9 +35,7 @@ Grid::Grid(int rows, int cols){
 
 
 
-void Grid::circle(int centre_x, int centre_y, float radius, double IN_CIRCLE, 
-        double BOUNDARY, double OUT_CIRCLE, bool IN_CIRCLE_FIX, bool BOUNDARY_FIX,
-        bool OUT_CIRCLE_FIX){
+void Grid::circle(int centre_x, int centre_y, float radius, map<string,double> params, map<string,bool> fix_dict){
   // getting the limits for the iteration
   int min_x{centre_x - (int(radius)+1)};
 
@@ -51,16 +51,16 @@ void Grid::circle(int centre_x, int centre_y, float radius, double IN_CIRCLE,
       float dist{(i-centre_x)*(i-centre_x) + (j-centre_y)*(j-centre_y)};
       
         // checking if a point is in the circle from the equation of a circle
-        if(radius*radius>dist){
-            if(IN_CIRCLE_FIX){
-    	        mesh[i][j] = IN_CIRCLE; //CHANGE temp =10V for comparison
-                change_indices[i][j] = false;
+        if(radius*radius<dist){
+            if(fix_dict["OUTSIDE"]){
+    	        mesh[i][j] = params["OUTSIDE"]; 
+                change_indices[i][j] = false; //if fixed then set changeable to false 
             }
         }
         else{
-            if(OUT_CIRCLE_FIX){
-                mesh[i][j] = OUT_CIRCLE;
-                change_indices[i][j] = OUT_CIRCLE_FIX;
+            if(fix_dict["INSIDE"]){
+                mesh[i][j] = params["INSIDE"];
+                change_indices[i][j] = false;
             }
         }
 
@@ -75,7 +75,7 @@ void Grid::circle(int centre_x, int centre_y, float radius, double IN_CIRCLE,
 	         fabs(sqrt(fabs(radius*radius-(centre_y-j)*(centre_y-j)))-
 	      	fabs(i-centre_x))
 	         <=0.5){
-      	    mesh[i][j] = BOUNDARY;
+      	    mesh[i][j] = params["BOUNDARY"];
             change_indices[i][j] = false;
 	        }
         }
