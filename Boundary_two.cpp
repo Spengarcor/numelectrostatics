@@ -22,7 +22,7 @@ int main(){
         
     vec[mid][mid] = 2;
     
-    for(int i = mid - r; i <= mid + r; i++){
+    for(int i = mid - r; i <= mid + r; i++){ // looping over a square that contains the circle that will be generated, saves on computing time
         for(int j = mid - r; j <= mid + r; j++){
             if ((i-mid)*(i-mid) + (j-mid)*(j-mid) <= r*r){
                 vec[i][j] = 1;
@@ -30,12 +30,12 @@ int main(){
         }
     }
     
-    for (int i=0; i<n;i++){
+    for (int i=0; i<n;i++){ // populating the end boundaries
         vec[i][0]=high;
         vec[i][n-1]=low;
     }
     
-    for(int i = 0; i < n; i++){
+    for(int i = 0; i < n; i++){ // Printing the final matrix
         for(int j = 0; j < n; j++){
             cout << vec[i][j] << " ";
         }
