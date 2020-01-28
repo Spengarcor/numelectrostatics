@@ -41,4 +41,3 @@ void Grid::circle(int centre_x, int centre_y, float radius, SETTINGS){
     }
   }
 }
-  
