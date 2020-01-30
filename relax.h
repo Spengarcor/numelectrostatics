@@ -15,6 +15,9 @@ class Relax{
         //constructor
         Relax(std::vector<std::vector<double>>, std::vector<std::vector<bool>>);
 
+        //Getters
+        std::vector<std::vector<double>> get_mesh();
+
 
         double getBestp();
         double relaxPotential(double, double, int);
