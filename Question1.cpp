@@ -60,7 +60,7 @@ int main(){
         {"OUTSIDE", true}
     };
 
-    initialise.circle(50,50,45, outer_circle_params, outer_circle_fix_dict);
+    initialise.circle_alt(50,50,45, outer_circle_params, outer_circle_fix_dict);
 
 
     map<string,double> inner_circle_params ={
