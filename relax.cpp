@@ -4,6 +4,8 @@
 #include <unordered_set>
 #include <string>
 #include "relax.h"
+#include <cstdint>
+#include <limits.h>
 
 using namespace std;
 
