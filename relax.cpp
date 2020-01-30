@@ -15,6 +15,18 @@ Relax::Relax(vector<vector<double>> drawn_mesh, vector<vector<bool>> change_chec
 }
 
 
+//Getters
+vector<vector<double>> Relax::get_mesh(){
+
+        return mesh;
+    
+}
+
+
+
+
+
+
 double Relax::relaxPotential(double p, double del, int max_iter){
 
      /*
@@ -27,7 +39,7 @@ double Relax::relaxPotential(double p, double del, int max_iter){
 
     //Need to know how big a change each step of relaxation causes 
     //so we can determine when to stop i.e. when diminished returns
-    double change = 0; //CHANGE BACK TO 2*del
+    double change = 2*del; //CHANGE BACK TO 2*del
     int iter_count =0;
     int rows = mesh.size(), cols = mesh[0].size();
 
@@ -80,12 +92,6 @@ double Relax::relaxPotential(double p, double del, int max_iter){
         //keep track of number of tierations
         ++iter_count;
     }
-
-
-    //Check for convergence
-    //TODO Either return a negative change or throw error to signal non-vonvergence
-//    if(iter_count == max_iter) cout << "Convergence not found for the desired accuracy after" << max_iter << " iterations" << endl;
-
 
     return change;
 
