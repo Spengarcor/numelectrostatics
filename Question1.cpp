@@ -84,12 +84,14 @@ int main(){
     vector<vector<bool>> change_check = initialise.get_change_indices();
 
 
+
+
     Relax solver(grid, change_check);
 
     //double bestp = solver.getBestp();
 
 
-    solver.relaxPotential(0.5, 0.001, 10000);
+    solver.relaxPotential(0.5, 0.00001, 100000);
 
 
     vector<vector<double>> new_grid = solver.get_mesh();

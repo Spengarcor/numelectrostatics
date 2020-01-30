@@ -19,6 +19,8 @@ class Image{
 
     void single_point(std::tuple<int,int,double>);
 
+    void rectangle(int, int, int, int, float);
+
 
     std::vector<std::vector<double>> get_mesh();
     std::vector<std::vector<bool>> get_change_indices();

@@ -26,8 +26,8 @@ vector<vector<bool>> Image::get_change_indices(){
 //constructor
 Image::Image(int rows_in, int cols_in){
 
-    vector<vector<double>> blank_mesh(rows, vector<double>(cols, 0));
-    vector<vector<bool>> blank_change_indices(rows, vector<bool>(cols, true));
+    vector<vector<double>> blank_mesh(rows_in, vector<double>(cols_in, 0));
+    vector<vector<bool>> blank_change_indices(rows_in, vector<bool>(cols_in, true));
 
     mesh = blank_mesh;
     rows = rows_in; cols = cols_in;
@@ -114,10 +114,10 @@ void Image::circle(int centre_x, int centre_y, float radius, map<string,double> 
         }
     }
  }
+}
 
-<<<<<<< HEAD
 
-  void Image::Rectangle(int corner_x, int corner_y, int length_x, int length_y,
+  void Image::rectangle(int corner_x, int corner_y, int length_x, int length_y,
 			float V){
     /*
       Draw a boundary rectangle with fixed values inside and on the edges,
@@ -154,21 +154,17 @@ void Image::circle(int centre_x, int centre_y, float radius, map<string,double> 
     }
 
   }
-}
-=======
-}
-
 
 
 void Image::circle_alt(int centre_x, int centre_y, float radius, map<string,double> params, map<string,bool> fix_dict){
-  
+
 int rows = mesh.size(), cols = mesh[0].size();
 
-  
-  for(int i = 0; i != rows; i++){
-    for(int j = 0; j != cols; j++){
+
+  for(int i = 0; i != rows-1; i++){
+    for(int j = 0; j != cols-1; j++){
       float dist{(i-centre_x)*(i-centre_x) + (j-centre_y)*(j-centre_y)};
-      
+
         // checking if a point is in the circle from the equation of a circle
         if(radius*radius<dist){
             if(fix_dict["OUTSIDE"]){
@@ -200,6 +196,5 @@ int rows = mesh.size(), cols = mesh[0].size();
         }
     }
  }
-
 }
->>>>>>> 246125bbbd41fa4605c022d1122f935870f38243
+
