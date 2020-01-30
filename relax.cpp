@@ -95,12 +95,6 @@ double Relax::relaxPotential(double p, double del, int max_iter){
         ++iter_count;
     }
 
-
-    //Check for convergence
-    //TODO Either return a negative change or throw error to signal non-vonvergence
-//    if(iter_count == max_iter) cout << "Convergence not found for the desired accuracy after" << max_iter << " iterations" << endl;
-
-
     return change;
 
 }
