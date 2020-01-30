@@ -8,7 +8,7 @@ import matplotlib.cm as cm
 
 filename = input("Enter a csv file name or path:\n")
 
-data = np.loadtxt(filename, dtype=str, delimiter=' ')
+data = np.loadtxt(filename, dtype=str, delimiter=';')
 data = np.delete(data, -1, axis=1)
 data = data.astype(np.float)
 print(data)
@@ -23,6 +23,9 @@ values = np.array(data)
 print(values)
 print(X)
 print(Y)
-plt.pcolormesh(X, Y, values, cmap=plt.get_cmap("bwr"))
 
-plt.show()
+def scalar_field(X, Y, values):
+    plt.pcolormesh(X, Y, values, cmap=plt.get_cmap("bwr"))
+    plt.show()
+
+scalar_field(X, Y, values)
