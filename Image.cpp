@@ -131,25 +131,25 @@ void Image::circle(int centre_x, int centre_y, float radius, map<string,double> 
     
 
     // making sure the rectangle fits into the grid
-    if(corner_x<0){
-      length_x+=corner_x;
-      corner_x=0;
+    if(corner_x < 0){
+      length_x += corner_x;
+      corner_x = 0;
     }
-    if(corner_x+length_x>cols){
-      length_x+=(corner_x+length_x)-cols;
+    if(corner_x + length_x > cols){
+      length_x += (corner_x + length_x) - cols;
     }
-    if(corner_y<0){
-      length_y+=corner_y;
-      corner_y=0;
+    if(corner_y < 0){
+      length_y += corner_y;
+      corner_y = 0;
     }
-    if(corner_y+length_y>rows){
-      length_y+=(corner_y+length_y)-rows;
+    if(corner_y + length_y > rows){
+      length_y += (corner_y + length_y) - rows;
     }
 
     for(int i=0;i<length_x;i++){
       for(int j=0;j<length_y;j++){
-	mesh[corner_x+i][corner_y+j]=V;
-	change_indices[corner_x+i][corner_y+j]=false;
+	      mesh[corner_x+i][corner_y+j]=V;
+	      change_indices[corner_x+i][corner_y+j]=false;
       }
     }
 

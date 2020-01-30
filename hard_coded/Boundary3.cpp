@@ -1,13 +1,42 @@
-#include <iostream>
 #include <vector>
+#include <cmath>
+#include <iostream>
+#include <map>
+#include <string>
 #include <fstream>
+#include "relax.h"
+#include "Image.h"
 
 using namespace std;
   
+void save_to_csv(vector<vector<double>> mesh){
+
+    ofstream csv_file;
+
+    csv_file.open("Q3.csv");
+
+    for(int i = 0; i != mesh.size(); ++i){
+        for(int j = 0; j != mesh.size(); ++j){
+    
+            csv_file << mesh[i][j];
+            if(j != mesh.size()-1){
+                csv_file << ";";
+            }
+
+        }
+        csv_file << "\n";
+    }
+
+    csv_file.close();
+
+}
+
+
+
+
+
 int main(){ 
     
-    ofstream myfile;
-    myfile.open ("grid.csv");
     
     int b1 = 20; // 1st potential boundary
     int b2 = -20; // 2nd potential boundary
@@ -16,7 +45,7 @@ int main(){
     int h = 5; // 1/2 height of boundaries inside the field
     int w = 5; // 1/2 width of boundaries
   
-    vector<vector<int> >  vec( n , vector<int> (m,1));
+    vector<vector<double> >  vec( n , vector<double> (m,1));
     vector<vector<bool> > check( n, vector<bool> (m, true));
   
     int gap = (n/4)-w; // this is the gap between each boundary within field
@@ -25,8 +54,6 @@ int main(){
     for (int i=0; i<m;i++){
         vec[0][i]=0;
         vec[n-1][i]=0;
-        check[0][i]=false;
-        check[n-1][i]=false;
     }
     
     for(int i = mid-h; i < mid+h; i++){
@@ -48,26 +75,35 @@ int main(){
         }
     }
     
-    for(int i = 0; i < n; i++){
-        for(int j = 0; j < n; j++){
-            myfile << vec[i][j] << ";";
-        }
-        myfile << "\n"; 
-    }   
+
     
-    myfile.close();
+
+
+    Relax solver(vec, check);
+
+
+
+
+    solver.relaxPotential(0.5, 0.00001, 100000);
+
+
+    vector<vector<double>> new_grid = solver.get_mesh();
+
+
     
-    ofstream myfile2;
-    myfile2.open("check.csv");
-    
-    for(int i = 0; i < n; i++){
-        for(int j = 0; j < n; j++){
-            myfile2 << check[i][j] << ";";
-        }
-        myfile2 << "\n"; 
-    }   
-  
-    myfile2.close();
+    save_to_csv(new_grid);
+
+
+
+
+
+
+
+
+
+
+
+   
   
 return 0; 
 } 
