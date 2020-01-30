@@ -3,6 +3,7 @@
 #include <vector>
 #include <map>
 #include <string>
+#include <tuple>
 
 
 class Image{
@@ -16,7 +17,7 @@ class Image{
     void circle(int, int, float, std::map<std::string,double>, std::map<std::string,bool>);
     void circle_alt(int, int, float, std::map<std::string,double>, std::map<std::string,bool>);
 
-    void single_points(vector<tuple<int,int,double>>);
+    void single_point(std::tuple<int,int,double>);
 
 
     std::vector<std::vector<double>> get_mesh();

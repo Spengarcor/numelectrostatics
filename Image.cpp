@@ -3,6 +3,7 @@
 #include <vector>
 #include <map>
 #include <string>
+#include <tuple>
 #include "Image.h"
 
 using namespace std;
@@ -35,7 +36,7 @@ Image::Image(int rows_in, int cols_in){
 
 }
 
-void Image::single_points(vector<tuple<int,int,double>> points){
+void Image::single_point(tuple<int,int,double> points){
     /*
         Requires input of a tuple where:
 
@@ -53,15 +54,12 @@ void Image::single_points(vector<tuple<int,int,double>> points){
     */
 
 
-    for(auto p : points){
-
-        int x_coord = get<0>(p);
-        int y_coord = get<1>(p);
-        double potential = get<2>(p);
+ 
+        int x_coord = get<0>(points);
+        int y_coord = get<1>(points);
+        double potential = get<2>(points);
 
         mesh[x_coord][y_coord] = potential;
-
-    }
 
 }
 
