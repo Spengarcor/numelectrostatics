@@ -82,4 +82,42 @@ void Image::circle(int centre_x, int centre_y, float radius, map<string,double> 
     }
  }
 
+
+  void Image::Rectangle(int corner_x, int corner_y, int length_x, int length_y,
+			float V){
+    /*
+      Draw a boundary rectangle with fixed values inside and on the edges,
+      its edges parallel to the grid-lines
+      
+      corner_x - x coordinate of top left corner
+      corner_y - y coordinate of top left corner
+      length_x - length in x coordinate
+      length_y - length in y coordinate
+     */
+    
+
+    // making sure the rectangle fits into the grid
+    if(corner_x<0){
+      length_x+=corner_x;
+      corner_x=0;
+    }
+    if(corner_x+length_x>cols){
+      length_x+=(corner_x+length_x)-cols;
+    }
+    if(corner_y<0){
+      length_y+=corner_y;
+      corner_y=0;
+    }
+    if(corner_y+length_y>rows){
+      length_y+=(corner_y+length_y)-rows;
+    }
+
+    for(int i=0;i<length_x;i++){
+      for(int j=0;j<length_y;j++){
+	mesh[corner_x+i][corner_y+j]=V;
+	change_indices[corner_x+i][corner_y+j]=false;
+      }
+    }
+
+  }
 }
