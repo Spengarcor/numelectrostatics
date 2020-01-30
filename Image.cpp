@@ -3,27 +3,27 @@
 #include <vector>
 #include <map>
 #include <string>
-#include "circle.h"
+#include "Image.h"
 
 using namespace std;
 
 
 
 //Getters
-vector<vector<double>> Grid::get_mesh(){
+vector<vector<double>> Image::get_mesh(){
 
         return mesh;
     
 }
 
-vector<vector<bool>> Grid::get_change_indices(){
+vector<vector<bool>> Image::get_change_indices(){
 
     return change_indices;
 
 }
 
 //constructor
-Grid::Grid(int rows, int cols){
+Image::Image(int rows, int cols){
 
     vector<vector<double>> blank_mesh(rows, vector<double>(cols, 0));
     vector<vector<bool>> blank_change_indices(rows, vector<bool>(cols, true));
@@ -35,7 +35,7 @@ Grid::Grid(int rows, int cols){
 
 
 
-void Grid::circle(int centre_x, int centre_y, float radius, map<string,double> params, map<string,bool> fix_dict){
+void Image::circle(int centre_x, int centre_y, float radius, map<string,double> params, map<string,bool> fix_dict){
   // getting the limits for the iteration
   int min_x{centre_x - (int(radius)+1)};
 

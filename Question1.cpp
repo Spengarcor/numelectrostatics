@@ -5,7 +5,7 @@
 #include <string>
 #include <fstream>
 #include "relax.h"
-#include "circle.h"
+#include "Image.h"
 
 using namespace std;
 
@@ -44,8 +44,8 @@ int main(){
 
     int rows = 100, cols = 100;
 
-    //use Grid object to draw shapes (initialise)
-    Grid initialise(rows, cols);
+    //use Image object to draw shapes (initialise)
+    Image initialise(rows, cols);
 
     //Set parameters for circle method
     map<string,double> outer_circle_params ={

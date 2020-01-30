@@ -5,7 +5,7 @@
 #include <string>
 #include <fstream>
 #include "relax.h"
-#include "circle.h"
+#include "Image.h"
 
 using namespace std;
 
@@ -79,7 +79,8 @@ int main(){
     //double bestp = solver.getBestp();
 
 
-    solver.relaxPotential(0.5, 0.001, 10000);
+    solver.relaxPotential(0.5, 0.0005, 10000);
+
 
 
     vector<vector<double>> new_grid = solver.get_mesh();

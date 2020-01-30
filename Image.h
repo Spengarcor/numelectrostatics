@@ -5,12 +5,12 @@
 #include <string>
 
 
-class Grid{
+class Image{
 
     public:
 
     //constructor
-    Grid(int, int);
+    Image(int, int);
 
 
     void circle(int, int, float, std::map<std::string,double>, std::map<std::string,bool>);
