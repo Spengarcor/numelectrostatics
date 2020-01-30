@@ -23,15 +23,50 @@ vector<vector<bool>> Image::get_change_indices(){
 }
 
 //constructor
-Image::Image(int rows, int cols){
+Image::Image(int rows_in, int cols_in){
 
     vector<vector<double>> blank_mesh(rows, vector<double>(cols, 0));
     vector<vector<bool>> blank_change_indices(rows, vector<bool>(cols, true));
 
     mesh = blank_mesh;
+    rows = rows_in; cols = cols_in;
+
     change_indices = blank_change_indices;
 
 }
+
+void Image::single_points(vector<tuple<int,int,double>> points){
+    /*
+        Requires input of a tuple where:
+
+        0 -- x coordinate of point
+        1 -- y coordinate of point
+        2 -- potential of point
+
+        initialise vector as = {
+            make_tuple(x_coord1, y_coord1, potential),
+            make_tuple(x_coord2, y_coord2, potential),
+            make_tuple(x_coord3, y_coord3, potential),
+        }
+
+
+    */
+
+
+    for(auto p : points){
+
+        int x_coord = get<0>(p);
+        int y_coord = get<1>(p);
+        double potential = get<2>(p);
+
+        mesh[x_coord][y_coord] = potential;
+
+    }
+
+}
+
+
+
 
 
 
@@ -48,6 +83,51 @@ void Image::circle(int centre_x, int centre_y, float radius, map<string,double> 
   
   for(int i=min_x;i<=max_x;i++){
     for(int j=min_y;j<=max_y;j++){
+      float dist{(i-centre_x)*(i-centre_x) + (j-centre_y)*(j-centre_y)};
+      
+        // checking if a point is in the circle from the equation of a circle
+        if(radius*radius<dist){
+            if(fix_dict["OUTSIDE"]){
+    	        mesh[i][j] = params["OUTSIDE"]; 
+                change_indices[i][j] = false; //if fixed then set changeable to false 
+            }
+        }
+        else{
+            if(fix_dict["INSIDE"]){
+                mesh[i][j] = params["INSIDE"];
+                change_indices[i][j] = false;
+            }
+        }
+
+
+        // So to avoid checking every point for a boundary
+        if(fabs(sqrt(dist)-radius)<sqrt(2)){
+
+	      // if the circle crosses a grid line within 0.5 from the point
+	      if(fabs(sqrt(fabs(radius*radius-(centre_x-i)*(centre_x-1)))
+	      	     -fabs(j-centre_y))
+	         <=0.5 || 
+	         fabs(sqrt(fabs(radius*radius-(centre_y-j)*(centre_y-j)))-
+	      	fabs(i-centre_x))
+	         <=0.5){
+      	    mesh[i][j] = params["BOUNDARY"];
+            change_indices[i][j] = false;
+	        }
+        }
+    }
+ }
+
+}
+
+
+
+void Image::circle_alt(int centre_x, int centre_y, float radius, map<string,double> params, map<string,bool> fix_dict){
+  
+int rows = mesh.size(), cols = mesh[0].size();
+
+  
+  for(int i = 0; i != rows; i++){
+    for(int j = 0; j != cols; j++){
       float dist{(i-centre_x)*(i-centre_x) + (j-centre_y)*(j-centre_y)};
       
         // checking if a point is in the circle from the equation of a circle

@@ -14,6 +14,10 @@ class Image{
 
 
     void circle(int, int, float, std::map<std::string,double>, std::map<std::string,bool>);
+    void circle_alt(int, int, float, std::map<std::string,double>, std::map<std::string,bool>);
+
+    void single_points(vector<tuple<int,int,double>>);
+
 
     std::vector<std::vector<double>> get_mesh();
     std::vector<std::vector<bool>> get_change_indices();
@@ -21,7 +25,10 @@ class Image{
     private:
 
 
-    std::vector<std::vector<double>>  mesh;
+    std::vector<std::vector<double>> mesh;
+    int rows, cols;
+
+
     std::vector<std::vector<bool>> change_indices;
 
 
