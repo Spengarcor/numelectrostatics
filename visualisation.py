@@ -20,6 +20,32 @@ Y = np.linspace(0, len(data[:,0]), len(data[:,0]))
 
 def show_scalar_field(X, Y, values):
     plt.pcolormesh(X, Y, values, cmap=plt.get_cmap("bwr"))
-    plt.show()
 
+
+def show_field_lines(X, Y, values):
+    graddata_x = []
+    graddata_y = []
+    for row in values:
+        gradrow = []
+        for x in range(1,len(row)-1):
+            gradrow.append(row[x+1] - row[x])
+        graddata_x.append(gradrow)
+
+    graddata_x = np.array(graddata_x)
+    graddata_x = np.column_stack((graddata_x.transpose()[0] , np.column_stack((graddata_x, graddata_x.transpose()[-1]))))
+
+    for column in values.T:
+        gradrow = []
+        for y in range(1,len(column)-1):
+            gradrow.append(column[y + 1] - column[y])
+        graddata_y.append(gradrow)
+
+    graddata_y = np.array(graddata_y)
+    graddata_y = np.column_stack((graddata_y.transpose()[0], np.column_stack((graddata_y, graddata_y.transpose()[-1]))))
+
+    plt.streamplot(X, Y, graddata_x, graddata_y.transpose(), color="black", density=0.5)
+
+
+show_field_lines(X, Y, values)
 show_scalar_field(X, Y, values)
+plt.show()
