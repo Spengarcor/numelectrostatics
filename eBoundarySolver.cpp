@@ -21,7 +21,7 @@ eBoundarySolver::eBoundarySolver(int rows_in, int cols_in){
     rows = rows_in; cols = cols_in;
 
     vector<vector<double>> blank_mesh(rows, vector<double>(cols, 0));
-    vector<vector<bool>> blank_fixed_indices(rows, vector<bool>(cols, true));
+    vector<vector<bool>> blank_fixed_indices(rows, vector<bool>(cols, false));
 
     mesh = blank_mesh;
     fixed_indices = blank_fixed_indices;
@@ -143,7 +143,7 @@ void eBoundarySolver::circle(int centre_x, int centre_y, float radius, map<strin
 //          Relaxation Methods          //
 //////////////////////////////////////////
 
-double eBoundarySolver::relaxPotential(double p, double del, int max_iter){
+double eBoundarySolver::relaxPotential(double del, int max_iter){
 
      /*
         p - relaxation parameter
@@ -155,12 +155,10 @@ double eBoundarySolver::relaxPotential(double p, double del, int max_iter){
 
     //Need to know how big a change each step of relaxation causes 
     //so we can determine when to stop i.e. when diminished returns
-    double change = 2*del; //CHANGE BACK TO 2*del
+    double change = (double) INT_MAX; //CHANGE BACK TO 2*del
     int iter_count =0;
-    int rows = mesh.size(), cols = mesh[0].size();
 
     //Values needed for equations
-    double p_minus1 = 1-p;
     double hx = 1 / (double)rows, hy = 1 / (double)cols;
     double alpha = pow(hx/hy, 2);
 
@@ -193,11 +191,10 @@ double eBoundarySolver::relaxPotential(double p, double del, int max_iter){
                     double y_before = j == 0 ? mesh[i][j] : mesh[i][j-1];
                     double y_after = j == cols - 1 ? mesh[i][j] : mesh[i][j+1]; 
 
-                    double average_potential = 1/(2 *(1 + alpha) ) 
-                        * ( x_before + x_after + alpha*(y_before + y_after) );
+                    mesh[i][j] = 1/(2 *(1 + alpha) ) 
+                             * ( x_before + x_after + alpha*(y_before + y_after) );
 
-                    mesh[i][j] = p * mesh[i][j] + p_minus1 * average_potential;
-
+                    
 
                     double difference = mesh[i][j] - original_potential;
                     change += difference * difference; // add difference squared
@@ -214,33 +211,6 @@ double eBoundarySolver::relaxPotential(double p, double del, int max_iter){
     }
 
     return change;
-
-}
-
-//Not working yet
-double eBoundarySolver::getBestp(){
-
-    double best_error = INT_MAX;
-    double best_p = 0;
-
-    vector<vector<double>> temp_copy = mesh;
-
-    for(double p = 0.1; p <=2; p += 0.1){
-
-        if(p > 1-0.001 && p < 1 +0.001) continue;
-
-        double error = relaxPotential(p,INT_MIN,10);
-
-        if(best_error > error){
-            best_p = p;
-            best_error = error;
-        }
-
-        mesh = temp_copy;
-
-    }
-
-    return best_p;
 
 }
 
