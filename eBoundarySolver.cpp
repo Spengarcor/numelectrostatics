@@ -71,20 +71,22 @@ void eBoundarySolver::rectangle(int corner_x, int corner_y, int length_x, int le
    */
   
 
+  //Change to throw error rather than change position of rectangle
+
   // making sure the rectangle fits into the grid
   if(corner_x < 0){
     length_x += corner_x;
     corner_x = 0;
   }
   if(corner_x + length_x > cols){
-    length_x += (corner_x + length_x) - cols;
+    length_x += (corner_x + length_x) - cols; 
   }
   if(corner_y < 0){
     length_y += corner_y;
     corner_y = 0;
   }
   if(corner_y + length_y > rows){
-    length_y += (corner_y + length_y) - rows;
+    length_y += (corner_y + length_y) - rows; 
   }
 
   for(int i=0;i<length_x;i++){
@@ -98,9 +100,6 @@ void eBoundarySolver::rectangle(int corner_x, int corner_y, int length_x, int le
 
 
 void eBoundarySolver::circle(int centre_x, int centre_y, float radius, map<string,double> params, map<string,bool> fix_dict){
-
-int rows = mesh.size(), cols = mesh[0].size();
-
 
   for(int i = 0; i != rows-1; i++){
     for(int j = 0; j != cols-1; j++){
@@ -149,7 +148,7 @@ double eBoundarySolver::relaxPotential(double p, double del, int max_iter){
      /*
         p - relaxation parameter
         del - the required accuracy before stopping relaxation
-        max_iter - a ceiling on hte number of iterations that can occur to give reasonable runtime 
+        max_iter - a ceiling on the number of iterations that can occur to give reasonable runtime 
     */
 
 

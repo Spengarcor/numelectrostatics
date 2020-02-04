@@ -40,12 +40,4 @@ class eBoundarySolver{
 
 };
 
-
-
-
-
-
-
-
-
 #endif
