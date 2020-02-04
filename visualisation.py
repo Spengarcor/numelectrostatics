@@ -46,6 +46,11 @@ def show_field_lines(X, Y, values):
     plt.streamplot(X, Y, graddata_x, graddata_y.transpose(), color="black", density=0.5)
 
 
-show_field_lines(X, Y, values)
+def show_equipotential(X, Y, values):
+    plt.contour(X, Y, values, 15, colors="grey", linestyles="solid")
+
+
 show_scalar_field(X, Y, values)
+show_equipotential(X, Y, values)
+show_field_lines(X, Y, values)
 plt.show()
