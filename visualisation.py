@@ -4,6 +4,7 @@ from matplotlib.colors import ListedColormap, LinearSegmentedColormap
 from colour import Color
 import matplotlib.colors as colors
 import matplotlib.cm as cm
+import matplotlib.patches as mpatches
 
 # Reads from a specified csv file to a matrix
 filename = input("Enter a csv file name or path:\n")
@@ -20,6 +21,9 @@ Y = np.linspace(0, len(data[:,0]), len(data[:,0]))
 
 def show_scalar_field(X, Y, values):
     plt.pcolormesh(X, Y, values, cmap=plt.get_cmap("bwr"))
+    neg_patch = mpatches.Patch(color='red', label='+ve')
+    pos_patch = mpatches.Patch(color='blue', label='-ve')
+    plt.legend(handles=[neg_patch, pos_patch])
 
 
 def show_field_lines(X, Y, values):
