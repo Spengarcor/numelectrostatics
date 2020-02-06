@@ -5,6 +5,7 @@ from colour import Color
 import matplotlib.colors as colors
 import matplotlib.cm as cm
 import matplotlib.patches as mpatches
+import scipy.ndimage as ndimage
 
 # Reads from a specified csv file to a matrix
 filename = input("Enter a csv file name or path:\n")
@@ -29,6 +30,7 @@ def show_scalar_field(X, Y, values):
 def show_field_lines(X, Y, values):
     graddata_x = []
     graddata_y = []
+
     for row in values:
         gradrow = []
         for x in range(1,len(row)-1):
@@ -51,10 +53,13 @@ def show_field_lines(X, Y, values):
 
 
 def show_equipotential(X, Y, values):
+    #values = ndimage.zoom(values, 0.1)
+    #X = ndimage.zoom(X, 0.1)
+    #Y = ndimage.zoom(Y, 0.1)
     plt.contour(X, Y, values, 15, colors="grey", linestyles="solid")
 
 
 show_scalar_field(X, Y, values)
 show_equipotential(X, Y, values)
 show_field_lines(X, Y, values)
-plt.show()
+plt.savefig("./plots/Q3.png")
