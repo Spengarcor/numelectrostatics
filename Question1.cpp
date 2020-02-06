@@ -4,48 +4,16 @@
 #include <map>
 #include <string>
 #include <fstream>
-#include "relax.h"
-#include "Image.h"
+#include "eBoundarySolver.h"
 
 using namespace std;
 
 
-
-void save_to_csv(vector<vector<double>> mesh){
-
-    ofstream csv_file;
-
-    csv_file.open("Q1.csv");
-
-    for(int i = 0; i != mesh.size(); ++i){
-        for(int j = 0; j != mesh.size(); ++j){
-    
-            csv_file << mesh[i][j];
-            if(j != mesh.size()-1){
-                csv_file << ";";
-            }
-
-        }
-        csv_file << "\n";
-    }
-
-    csv_file.close();
-
-}
-
-
-
-
-
-
 int main(){
-
-
 
     int rows = 100, cols = 100;
 
-    //use Image object to draw shapes (initialise)
-    Image initialise(rows, cols);
+    eBoundarySolver Q1(rows, cols);
 
     //Set parameters for circle method
     map<string,double> outer_circle_params ={
@@ -60,7 +28,7 @@ int main(){
         {"OUTSIDE", true}
     };
 
-    initialise.circle_alt(50,50,45, outer_circle_params, outer_circle_fix_dict);
+    Q1.circle(50,50,45, outer_circle_params, outer_circle_fix_dict);
 
 
     map<string,double> inner_circle_params ={
@@ -75,34 +43,12 @@ int main(){
         {"OUTSIDE", false}
     };
 
-
-    initialise.circle(50,50,25, inner_circle_params, inner_circle_fix_dict);
-
-
-    //Retrieve mesh and bool mesh layer for pasing to relax object
-    vector<vector<double>> grid = initialise.get_mesh();
-    vector<vector<bool>> change_check = initialise.get_change_indices();
+    Q1.circle(50,50,25, inner_circle_params, inner_circle_fix_dict);
 
 
+    Q1.relaxPotential_SOR(10e-10, 100000);
 
-
-    Relax solver(grid, change_check);
-
-    //double bestp = solver.getBestp();
-
-
-    solver.relaxPotential(0.5, 0.00001, 100000);
-
-
-    vector<vector<double>> new_grid = solver.get_mesh();
-
-
-    
-    save_to_csv(new_grid);
+    Q1.save_to_csv("Q1");
 
     return 0;
 }
-
-
-
-
