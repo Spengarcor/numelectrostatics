@@ -1,4 +1,5 @@
 #include <vector>
+#define _USE_MATH_DEFINES
 #include <cmath>
 #include <iostream>
 #include <string>
@@ -7,6 +8,8 @@
 #include <tuple>
 #include <fstream>
 #include "eBoundarySolver.h"
+
+
 
 using namespace std;
 
@@ -21,7 +24,7 @@ eBoundarySolver::eBoundarySolver(int rows_in, int cols_in){
     rows = rows_in; cols = cols_in;
 
     vector<vector<double>> blank_mesh(rows, vector<double>(cols, 0));
-    vector<vector<bool>> blank_fixed_indices(rows, vector<bool>(cols, true));
+    vector<vector<bool>> blank_fixed_indices(rows, vector<bool>(cols, false));
 
     mesh = blank_mesh;
     fixed_indices = blank_fixed_indices;
@@ -71,20 +74,22 @@ void eBoundarySolver::rectangle(int corner_x, int corner_y, int length_x, int le
    */
   
 
+  //Change to throw error rather than change position of rectangle
+
   // making sure the rectangle fits into the grid
   if(corner_x < 0){
     length_x += corner_x;
     corner_x = 0;
   }
   if(corner_x + length_x > cols){
-    length_x += (corner_x + length_x) - cols;
+    length_x += (corner_x + length_x) - cols; 
   }
   if(corner_y < 0){
     length_y += corner_y;
     corner_y = 0;
   }
   if(corner_y + length_y > rows){
-    length_y += (corner_y + length_y) - rows;
+    length_y += (corner_y + length_y) - rows; 
   }
 
   for(int i=0;i<length_x;i++){
@@ -98,9 +103,6 @@ void eBoundarySolver::rectangle(int corner_x, int corner_y, int length_x, int le
 
 
 void eBoundarySolver::circle(int centre_x, int centre_y, float radius, map<string,double> params, map<string,bool> fix_dict){
-
-int rows = mesh.size(), cols = mesh[0].size();
-
 
   for(int i = 0; i != rows-1; i++){
     for(int j = 0; j != cols-1; j++){
@@ -144,24 +146,96 @@ int rows = mesh.size(), cols = mesh[0].size();
 //          Relaxation Methods          //
 //////////////////////////////////////////
 
-double eBoundarySolver::relaxPotential(double p, double del, int max_iter){
+double eBoundarySolver::relaxPotential_J(double del, int max_iter){
 
      /*
-        p - relaxation parameter
+        An implementation of the Jacobi method for relaxaing an ODE
+
         del - the required accuracy before stopping relaxation
-        max_iter - a ceiling on hte number of iterations that can occur to give reasonable runtime 
+        max_iter - a ceiling on the number of iterations that can occur to give reasonable runtime 
     */
 
 
 
     //Need to know how big a change each step of relaxation causes 
     //so we can determine when to stop i.e. when diminished returns
-    double change = 2*del; //CHANGE BACK TO 2*del
+    double change = (double) INT_MAX; 
     int iter_count =0;
-    int rows = mesh.size(), cols = mesh[0].size();
 
     //Values needed for equations
-    double p_minus1 = 1-p;
+    double hx = 1 / (double)rows, hy = 1 / (double)cols;
+    double alpha = pow(hx/hy, 2);
+
+
+    vector<vector<double>> original_potential = mesh;
+
+    while(change > del && iter_count < max_iter){
+
+        //Initialise change as will keep a running total for each mesh point
+        change = 0;
+
+        vector<vector<double>> original_potential = mesh;
+
+        //Loop over all points
+        for(int i = 0; i != rows; ++i){ 
+            for(int j = 0; j != cols; ++j){
+            
+                
+                if(fixed_indices[i][j]){
+
+                    continue;
+
+                } else {
+
+
+                    //Basic handling of non-boundary edges
+                    //For edges, just take the current value so the average is slightly weighted towards its current value
+                    double x_before = i == 0 ? original_potential[i][j] : original_potential[i-1][j];
+                    double x_after = i == rows - 1 ? original_potential[i][j] : original_potential[i+1][j];
+                    double y_before = j == 0 ? original_potential[i][j] : original_potential[i][j-1];
+                    double y_after = j == cols - 1 ? original_potential[i][j] : original_potential[i][j+1]; 
+
+                    mesh[i][j] = 1/(2 *(1 + alpha) ) 
+                             * ( x_before + x_after + alpha*(y_before + y_after) );
+
+                    
+
+                    double difference = mesh[i][j] - original_potential[i][j];
+                    change += difference * difference; // add difference squared
+
+                }
+            }
+        }
+
+
+        //get RMS of change
+        change = sqrt( change / (rows*cols) );
+        //keep track of number of iterations
+        ++iter_count;
+    }
+
+    return change;
+
+}
+
+
+double eBoundarySolver::relaxPotential_GS(double del, int max_iter){
+
+     /*
+        An implementation of the Gauss-Seidel method for relaxaing an ODE
+        
+        del - the required accuracy before stopping relaxation
+        max_iter - a ceiling on the number of iterations that can occur to give reasonable runtime 
+    */
+
+
+
+    //Need to know how big a change each step of relaxation causes 
+    //so we can determine when to stop i.e. when diminished returns
+    double change = (double) INT_MAX; 
+    int iter_count =0;
+
+    //Values needed for equations
     double hx = 1 / (double)rows, hy = 1 / (double)cols;
     double alpha = pow(hx/hy, 2);
 
@@ -194,11 +268,10 @@ double eBoundarySolver::relaxPotential(double p, double del, int max_iter){
                     double y_before = j == 0 ? mesh[i][j] : mesh[i][j-1];
                     double y_after = j == cols - 1 ? mesh[i][j] : mesh[i][j+1]; 
 
-                    double average_potential = 1/(2 *(1 + alpha) ) 
-                        * ( x_before + x_after + alpha*(y_before + y_after) );
+                    mesh[i][j] = 1/(2 *(1 + alpha) ) 
+                             * ( x_before + x_after + alpha*(y_before + y_after) );
 
-                    mesh[i][j] = p * mesh[i][j] + p_minus1 * average_potential;
-
+                    
 
                     double difference = mesh[i][j] - original_potential;
                     change += difference * difference; // add difference squared
@@ -218,32 +291,83 @@ double eBoundarySolver::relaxPotential(double p, double del, int max_iter){
 
 }
 
-//Not working yet
-double eBoundarySolver::getBestp(){
+double eBoundarySolver::relaxPotential_SOR(double del, int max_iter){
 
-    double best_error = INT_MAX;
-    double best_p = 0;
+     /*
+        An implementation of the SOR method for relaxaing an ODE
+        
+        del - the required accuracy before stopping relaxation
+        max_iter - a ceiling on the number of iterations that can occur to give reasonable runtime 
+    */
 
-    vector<vector<double>> temp_copy = mesh;
 
-    for(double p = 0.1; p <=2; p += 0.1){
 
-        if(p > 1-0.001 && p < 1 +0.001) continue;
+    //Need to know how big a change each step of relaxation causes 
+    //so we can determine when to stop i.e. when diminished returns
+    double change = (double) INT_MAX;
+    int iter_count =0;
 
-        double error = relaxPotential(p,INT_MIN,10);
+    //Values needed for equations
+    double hx = 1 / (double)rows, hy = 1 / (double)cols;
+    double alpha = pow(hx/hy, 2);
 
-        if(best_error > error){
-            best_p = p;
-            best_error = error;
+    double omega = 2/ ( 1 + sin(M_PI*hx) );
+    double one_minus_omega = 1 - omega; 
+
+
+
+    while(change > del && iter_count < max_iter){
+
+        //Initialise change as will keep a running total for each mesh point
+        change = 0;
+
+        //Loop over all points
+        for(int i = 0; i != rows; ++i){ 
+            for(int j = 0; j != cols; ++j){
+            
+                
+                if(fixed_indices[i][j]){
+
+                    continue;
+
+                } else {
+
+                    //save original value for change calculation
+                    double original_potential = mesh[i][j];                
+
+
+                    //Basic handling of non-boundary edges
+                    //For edges, just take the current value so the average is slightly weighted towards its current value
+                    double x_before = i == 0 ? mesh[i][j] : mesh[i-1][j];
+                    double x_after = i == rows - 1 ? mesh[i][j] : mesh[i+1][j];
+                    double y_before = j == 0 ? mesh[i][j] : mesh[i][j-1];
+                    double y_after = j == cols - 1 ? mesh[i][j] : mesh[i][j+1]; 
+
+                    double average_potential = 1/(2 *(1 + alpha) ) 
+                             * ( x_before + x_after + alpha*(y_before + y_after) );
+
+                    mesh[i][j] = one_minus_omega * mesh[i][j] + omega * average_potential;
+
+                    double difference = mesh[i][j] - original_potential;
+                    change += difference * difference; // add difference squared
+
+                }
+            }
         }
 
-        mesh = temp_copy;
 
+        //get RMS of change
+        change = sqrt( change / (rows*cols) );
+        //keep track of number of iterations
+        ++iter_count;
     }
 
-    return best_p;
+    return change;
 
 }
+
+
+
 
 
 //////////////////////////////////////////

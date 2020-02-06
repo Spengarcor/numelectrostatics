@@ -28,7 +28,7 @@ int main(){
     Q3.rectangle(150,240,45,60,0);
 
 
-    Q3.relaxPotential(0.5, 0.0001, 10000);
+    Q3.relaxPotential_SOR(0.0001, 10000);
 
     Q3.save_to_csv("Q3");
 

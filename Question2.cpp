@@ -37,7 +37,7 @@ int main(){
     Q2.circle(50,50,10, inner_circle_params, inner_circle_fix_dict);
 
 
-    Q2.relaxPotential(0.5, 0.00001, 1000000);
+    Q2.relaxPotential_SOR(10e-5, 1000000);
 
     Q2.save_to_csv("Q2");
 

@@ -24,8 +24,9 @@ class eBoundarySolver{
 
 
         //Relaxation methods
-        double getBestp();
-        double relaxPotential(double, double, int);
+        double relaxPotential_J(double, int);
+        double relaxPotential_GS(double, int);
+        double relaxPotential_SOR(double, int);
         
         //Saving methods
         void save_to_csv(std::string);
@@ -39,13 +40,5 @@ class eBoundarySolver{
         std::vector<std::vector<bool>> fixed_indices;
 
 };
-
-
-
-
-
-
-
-
 
 #endif
