@@ -30,26 +30,6 @@ class Electrostatics(QTabWidget):
         self.tab1.setLayout(layout)
         self.plot()
 
-        #self.title="title"
-        #self.left=10
-        #self.top=10
-        #self.width=640
-        #self.height=480
-        #self.initUI()
-        #self.figure = plt.figure(figsize=(10,5))
-        #self.canvas = FigureCanvas(self.figure)
-        #fig = Figure(figsize=(width, height), dpi=dpi)
-        #self.axes = fig.add_subplot(111)
-
-        #FigureCanvas.__init__(self, fig)
-        #self.setParent(parent)
-
-        #FigureCanvas.setSizePolicy(self,
-        #                QSizePolicy.Expanding,
-        #                QSizePolicy.Expanding)
-        #FigureCanvas.updateGeometry(self)
-        #self.plot()
-
     def initUI(self):
         self.setWindowTitle(self.title)
         self.setGeometry(self.left, self.top, self.width,self.height)
@@ -71,7 +51,7 @@ class Electrostatics(QTabWidget):
     # Reads from a specified csv file to a matrix
     def get_display(self):
         #filename = input("Enter a csv file name or path:\n")
-        filename = "../CSV_files/Q2.csv"
+        filename = "../CSV_files/Q1.csv"
         data = np.loadtxt(filename, dtype=str, delimiter=';')
         data = np.delete(data, -1, axis=1)
         data = data.astype(np.float)
