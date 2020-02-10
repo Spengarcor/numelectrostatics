@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 4.11.0, 2020-02-04T14:36:20. -->
+<!-- Written by QtCreator 4.11.0, 2020-02-06T19:53:29. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -141,11 +141,11 @@
     </valuelist>
     <value type="int" key="PE.EnvironmentAspect.Base">2</value>
     <valuelist type="QVariantList" key="PE.EnvironmentAspect.Changes"/>
-    <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">electrostatics</value>
-    <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">PythonEditor.RunConfiguration./home/jhfm/Electrostatics/electrostatics.py</value>
-    <value type="QString" key="ProjectExplorer.RunConfiguration.BuildKey">/home/jhfm/Electrostatics/electrostatics.py</value>
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">electrostatics2</value>
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">PythonEditor.RunConfiguration./home/jhfm/Documents/numelectrostatics/QT/electrostatics.py</value>
+    <value type="QString" key="ProjectExplorer.RunConfiguration.BuildKey">/home/jhfm/Documents/numelectrostatics/QT/electrostatics.py</value>
     <value type="QString" key="PythonEditor.RunConfiguation.Interpreter">{9c9f71c7-53dc-497f-84c4-b1851614ded9}</value>
-    <value type="QString" key="PythonEditor.RunConfiguation.Script">/home/jhfm/Electrostatics/electrostatics.py</value>
+    <value type="QString" key="PythonEditor.RunConfiguation.Script">/home/jhfm/Documents/numelectrostatics/QT/electrostatics.py</value>
     <value type="QString" key="RunConfiguration.Arguments"></value>
     <value type="bool" key="RunConfiguration.Arguments.multi">false</value>
     <value type="QString" key="RunConfiguration.OverrideDebuggerStartup"></value>
@@ -155,7 +155,7 @@
     <value type="bool" key="RunConfiguration.UseQmlDebugger">false</value>
     <value type="bool" key="RunConfiguration.UseQmlDebuggerAuto">true</value>
     <value type="QString" key="RunConfiguration.WorkingDirectory"></value>
-    <value type="QString" key="RunConfiguration.WorkingDirectory.default">/home/jhfm/Electrostatics</value>
+    <value type="QString" key="RunConfiguration.WorkingDirectory.default">/home/jhfm/Documents/numelectrostatics/QT</value>
    </valuemap>
    <value type="int" key="ProjectExplorer.Target.RunConfigurationCount">1</value>
   </valuemap>

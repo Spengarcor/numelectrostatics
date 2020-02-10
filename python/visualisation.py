@@ -62,4 +62,4 @@ def show_equipotential(X, Y, values):
 show_scalar_field(X, Y, values)
 show_equipotential(X, Y, values)
 show_field_lines(X, Y, values)
-plt.savefig("./plots/Q3.png")
+plt.savefig("./plots/Q2_SOR.png")
