@@ -15,6 +15,7 @@ import matplotlib.path as path
 #from PySide2.QtCore import Slots
 
 
+
 class Electrostatics(QTabWidget):
     def __init__(self, parent=None):
         #QMainWindow.__init__(self)
