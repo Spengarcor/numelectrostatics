@@ -4,3 +4,5 @@
 test.cpp
 .ignore/
 *.txt
+laplace/
+ignore.py

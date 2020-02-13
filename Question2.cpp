@@ -14,13 +14,13 @@ using namespace std;
 
 int main(){
 
-    int rows = 100, cols = 100;
+    int rows = 500, cols = 500;
 
     eBoundarySolver Q2(rows,cols);
 
 
-    Q2.rectangle(0,0,rows,25,20);
-    Q2.rectangle(0,cols-26,rows,26,-20);
+    Q2.rectangle(0,0,rows,1,20);
+    Q2.rectangle(0,cols-1,rows,1,-20);
 
     map<string,double> inner_circle_params ={
         {"INSIDE", 0},
@@ -34,12 +34,12 @@ int main(){
         {"OUTSIDE", false}
     };
 
-    Q2.circle(50,50,10, inner_circle_params, inner_circle_fix_dict);
+    Q2.circle(250,250,60, inner_circle_params, inner_circle_fix_dict);
 
 
-    Q2.relaxPotential_SOR(10e-5, 1000000);
+    Q2.relaxPotential_SOR(10e-10, 1000000);
 
-    Q2.save_to_csv("Q2");
+    Q2.save_to_csv("Q2_SOR");
 
     return 0;
 
