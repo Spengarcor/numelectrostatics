@@ -9,6 +9,8 @@
 #include <fstream>
 #include <climits>
 #include "eBoundarySolver.h"
+#include <boost/python.hpp>
+
 
 using namespace std;
 
@@ -391,4 +393,18 @@ void eBoundarySolver::save_to_csv(string fname){
 
     csv_file.close();
 
-}	
+}
+
+
+BOOST_PYTHON_MODULE(boundaries_ext){
+ 	using namespace boost::python;
+	class_<eBoundarySolver, boost::noncopyable>("eBoundarySolver", init<int, int>())
+		.def("single_point", &eBoundarySolver::single_point)
+		.def("rectangle", &eBoundarySolver::rectangle)
+		.def("circle", &eBoundarySolver::circle)
+		.def("relaxPotential_J", &eBoundarySolver::relaxPotential_J)
+		.def("relaxPotential_G", &eBoundarySolver::relaxPotential_GS)
+		.def("relaxPotential_SOR", &eBoundarySolver::relaxPotential_SOR)
+		.def("save_to_csv", &eBoundarySolver::save_to_csv)
+		;
+}
