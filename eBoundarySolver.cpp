@@ -7,9 +7,8 @@
 #include <string>
 #include <tuple>
 #include <fstream>
+#include <climits>
 #include "eBoundarySolver.h"
-
-
 
 using namespace std;
 
@@ -367,9 +366,6 @@ double eBoundarySolver::relaxPotential_SOR(double del, int max_iter){
 }
 
 
-
-
-
 //////////////////////////////////////////
 //             File Methods             //
 //////////////////////////////////////////
@@ -395,5 +391,4 @@ void eBoundarySolver::save_to_csv(string fname){
 
     csv_file.close();
 
-}
-
+}	
