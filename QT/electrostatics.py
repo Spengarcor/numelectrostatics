@@ -12,7 +12,8 @@ from PySide2.QtWidgets import *
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 import random
 import matplotlib.path as path
-import eBoundarySolver
+#import eBoundarySolver
+from pylib import eBoundarySolver
 #from PySide2.QtCore import Slots
 
 
