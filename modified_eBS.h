@@ -18,10 +18,10 @@ class eBoundarySolver{
         eBoundarySolver(int, int);
 
         //Boundary condition drawing methods
-        void single_point(std::tuple<int,int,double>, bool);
+        void single_point(std::tuple<int,int,double>, int);
         void rectangle(int, int, int, int, float); //refactor
-        void circle(int, int, float, std::map<std::string,double>, std::map<std::string,bool>); //refactor
-
+        void circle(int, int, double, double, double, double); //refactor
+	void change_boundary(int, int, int, double, double);
 
         //Relaxation methods
         double relaxPotential_J(double, int);
@@ -37,8 +37,8 @@ class eBoundarySolver{
 
         int rows, cols;
         std::vector<std::vector<double>> mesh;
-        std::vector<std::vector<bool>> fixed_indices;
-
+        std::vector<std::vector<int>> fixed_indices;
+	std::vector<std::vector<std::vector<double>>> boundaries;
 };
 
 #endif
