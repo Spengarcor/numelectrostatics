@@ -15,6 +15,8 @@
 #include <thread> //???
 #include <chrono> //deals with time ie. measure time spans, specific points in time, real clocks   
 
+//const int num_CPU_states = 10;
+
 //Using enum to number each CPU state from 0-10 for easier referencing in functions
 enum CPUStates {
 
@@ -32,25 +34,25 @@ enum CPUStates {
 }; //Why ;?
 
 //declaring structure of data type for our CPUdata objects
-struct CPUdata {
+typedef struct CPUdata {
 	std::string cpu; //to read string of CPU data from each line of /proc/stat
-	size_t times[num_CPU_states]; //declaring array of size 10 to store CPU state times of each CPU and total
+	size_t times[10/*num_CPU_states*/]; //declaring array of size 10 to store CPU state times of each CPU and total
 
 	//size_t is type able to represent largest size of any object in bytes, basically just unsigned (can never be negative) better version of signed (can be both positive and negative) int
-}
+} CPUData;
 
 //reads in CPU time at two snapshots from /proc/stat
 struct Read {
 	void ReadCPUdata(std::vector<CPUData> & entries);
-}
+};
 
 //saves CPU consumption and CPU time iteratively to CSV file for each number of iterations in numerical solver
 struct Save {
 		
-	size_t TimeIdle(); 
-	size_t TimeActive();	
+	size_t TimeIdle(const CPUData & e); 
+	size_t TimeActive(const CPUData & e);	
 	
-	void SaveCPUdata();	
-}
+	void SaveCPUdata(const std::vector<CPUData> & snapshot1, const std::vector<CPUData> & snapshot2/*, const size_t n*/);	
+};
 
 #endif		

@@ -9,6 +9,7 @@
 #include <sstream> //header providing string stream classes such as std::istringstream
 #include <thread> //???
 #include <chrono> //deals with time ie. measure time spans, specific points in time, real clocks 
+#include "cpucon.h"
 
 //Need to declare vectors of data type CPUdata to store CPU data fetched from /proc/stat, in Questionx.cpp
 /*	std::vector<CPUData> snapshot1;
@@ -43,57 +44,59 @@ void Read::ReadCPUdata(std::vector<CPUData> & entries) {
 
 //Defining function used in SaveCPUdata which calculates Idle time of CPU's based on CPU data fetched by ReadCPUdata. Takes in element of entries[i] of type CPUData and adds idle state times together.
 size_t Save::TimeIdle(const CPUData & s) {
-	
-	return e.times(S_IDLE) + e.times(S_IOWAIT);
+
+	size_t idle = s.times(S_IDLE) + s.times(S_IOWAIT);	
+	return idle;
 	
 }
 
 //Defining function used in SaveCPUdata which calculates active time of CPU's based on CPU data fetched by ReadCPUdata
 size_t Save::TimeActive(const CPUData & s) {
-
-	return e.times(S_USER)+e.times(S_NICE)+e.times(S_SYSTEM)+e.times(S_IRQ)+e.times(S_SOFTIRQ)+e.times(S_STEAL)+e.times(S_GUEST)+e.times(S_GUEST_NICE);
 	
+	size_t active = s.times(S_USER) + s.times(S_NICE) + s.times(S_SYSTEM) + s.times(S_IRQ) + s.times(S_SOFTIRQ) + s.times(S_STEAL) + s.times(S_GUEST) + s.times(S_GUEST_NICE);
+	return active;
 }
 
 //Defining function which calculates the active CPU time as a % of total CPU time ((active time)/(active time + idle time))
 //Saves this iteratively to separate cpuanalysis.csv files for each CPU core and CPU total, along with total CPU time and number of iterations used in num solver 'n'
-void Save::SaveCPUdata(const std::vector<CPUData> & snapshot1, const std::vector<CPUData> & snapshot2, const size_t n) {
+void Save::SaveCPUdata(const std::vector<CPUData> & snapshot1, const std::vector<CPUData> & snapshot2/*, const size_t n*/) {
 		
-		//Declaring constant stating size of snapshot, so that for loop can run through each element
-		const size_t Num_of_Entries = snapshot1.size();	
+	//Declaring constant stating size of snapshot, so that for loop can run through each element
+	const size_t Num_of_Entries = snapshot1.size();	
 	
-		//Saving CPU consumption and CPU time for each core to different CPUanalysis(0-4).csv files. Where 0 is CPU total, 1 is CPU core 1, etc.
-		const std::string cpuanalysis = "cpuanalysis";
-		const std::string csv = ".csv";
-		const std::string filename;
+	//Saving CPU consumption and CPU time for each core to different CPUanalysis(0-4).csv files. Where 0 is CPU total, 1 is CPU core 1, etc.
+	const std::string cpuanalysis = "cpuanalysis";
+	const std::string csv = ".csv";
+	const std::string filename;
 		
-		//Running through each line of /proc/stat to find CPU consumption and total CPU time
-		for (size_t i=0; i < Num_of_Entries; i++) {	
+	//Running through each line of /proc/stat to find CPU consumption and total CPU time
+	for (size_t i=0; i < Num_of_Entries; i++) {	
 		
-			//Declaring constant of type CPUdata to store element of vector<CPUData> entries[i]
-			const CPUData & s1 = snapshot1;
-			const CPUData & s2 = snapshot2;
+		//Declaring constant of type CPUdata to store element of vector<CPUData> entries[i]
+		const CPUData & s1 = snapshot1;
+		const CPUData & s2 = snapshot2;
 			
-			//Calculating active time, idle time, and total time of numerical solver, casting RHS as floats to match LHS
-			const float ACTIVE_TIME = static_cast<float>(TimeActive(s1) - TimeActive(s2)); //difference in active time between each snapshot
-			const float IDLE_TIME = static_cast<float>(TimeIdle(s1) - TimeIdle(s1)); //difference in idle time between each snapshot
-			const float TOTAL_TIME = ACTIVE_TIME + TOTAL_TIME;
+		//Calculating active time, idle time, and total time of numerical solver, casting RHS as floats to match LHS
+		const float ACTIVE_TIME = static_cast<float>(TimeActive(s1) - TimeActive(s2)); //difference in active time between each snapshot
+		const float IDLE_TIME = static_cast<float>(TimeIdle(s1) - TimeIdle(s1)); //difference in idle time between each snapshot
+		const float TOTAL_TIME = ACTIVE_TIME + TOTAL_TIME;
 		
-			//Calculating CPU Consumption by dividing active CPU time between snapshots by total CPU time between snapshots
-			const float CPUConsumption = 100*(ACTIVE_TIME/TOTAL_TIME);
+		//Calculating CPU Consumption by dividing active CPU time between snapshots by total CPU time between snapshots
+		const float CPUConsumption = 100*(ACTIVE_TIME/TOTAL_TIME);
 			
-			//Using stringstream to create string that can be used to loop through different save files and pipe results
-			std::stringstream ss;
-			ss << i;
-			file = cpuanalysis + ss.str() + csv;
+		//Using stringstream to create string that can be used to loop through different save files and pipe results
+		std::stringstream ss;
+		ss << i;
+		file = cpuanalysis + ss.str() + csv;
 			
-			//Opening file
-			std::ofstream file;
-			file.open(file.c_str()); //.c_str() returns pointer to c-string representation of 'file' string object's value
+		//Opening file
+		std::ofstream file;
+		file.open(file.c_str()); //.c_str() returns pointer to c-string representation of 'file' string object's value
 			
-			//Writing results into file	
-			file << n ", " CPUConsumption ", " TOTAL_TIME << endl;
+		//Writing results into file	
+		file << n ", " CPUConsumption ", " TOTAL_TIME << endl;
 
-			//Closing file
-			file.close();
-} 
+		//Closing file
+		file.close();
+	}
+}	 
