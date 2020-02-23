@@ -18,8 +18,8 @@ class eBoundarySolver{
         eBoundarySolver(int, int);
 
         //Boundary condition drawing methods
-        void single_point(std::tuple<int,int,double>, int);
-        void rectangle(int, int, int, int, float); //refactor
+        void single_point(std::tuple<int,int,double>, bool);
+        void rectangle(int, int, int, int, double); //refactor
         void circle(int, int, double, double, double, double); //refactor
 	void change_boundary(int, int, int, double, double);
 

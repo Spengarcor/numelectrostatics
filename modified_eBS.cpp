@@ -8,7 +8,7 @@
 #include <tuple>
 #include <fstream>
 #include <climits>
-#include "eBoundarySolver.h"
+#include "modified_eBS.h"
 
 using namespace std;
 
@@ -23,7 +23,7 @@ eBoundarySolver::eBoundarySolver(int rows_in, int cols_in){
     rows = rows_in; cols = cols_in;
 
     vector<vector<double>> blank_mesh(rows, vector<double>(cols, 0));
-    vector<vector<bool>> blank_fixed_indices(rows, vector<int>(cols, 0));
+    vector<vector<int>> blank_fixed_indices(rows, vector<int>(cols, 0));
     vector<vector<vector<double>>> blank_boundaries(rows,
 						    vector<vector<double>>( 
 						    cols,
@@ -40,7 +40,7 @@ eBoundarySolver::eBoundarySolver(int rows_in, int cols_in){
 //       Boundary Drawing Methods       //
 //////////////////////////////////////////
 
-void eBoundarySolver::single_point(tuple<int,int,double> point, bool fixed){
+void eBoundarySolver::single_point(tuple<int,int,double> point, bool fixed ){
     /*
         Requires input of a tuple where:
 
@@ -269,7 +269,14 @@ double eBoundarySolver::relaxPotential_J(double del, int max_iter){
 		      x_after = isnan(boundaries[i][j][0]) ? x_after : boundaries[i][j][0];
 		      y_before = isnan(boundaries[i][j][6]) ? y_before : boundaries[i][j][6];
 		      y_after = isnan(boundaries[i][j][2]) ? y_after : boundaries[i][j][2];
-		      mesh[i][j]
+		      double hx_after = isnan(boundaries[i][j][0]) ? hx : boundaries[i][j][1];
+		      double hx_before = isnan(boundaries[i][j][4]) ? hx : boundaries[i][j][5];
+		      double hy_after = isnan(boundaries[i][j][2]) ? hy : boundaries[i][j][3];
+		      double hy_before = isnan(boundaries[i][j][6]) ? hy : boundaries[i][j][7];
+		      mesh[i][j] = (x_before*hx_after + x_after*hx_before)/
+			(hx_after + hx_before) +
+			(y_before*hy_after + y_after*hy_before)/
+			(hy_after + hy_before);
 		    }
                     double difference = mesh[i][j] - original_potential[i][j];
                     change += difference * difference; // add difference squared
