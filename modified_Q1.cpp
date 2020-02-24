@@ -46,7 +46,7 @@ int main(){
     Q1.circle(50,50,25,0,0,nan(""));
 
 
-    Q1.relaxPotential_SOR(10e-10, 100000);
+    Q1.relaxPotential_J(10e-10, 100000);
 
     Q1.save_to_csv("Q1");
 

@@ -127,7 +127,7 @@ void eBoundarySolver::circle(int centre_x, int centre_y, double radius,
 	  fixed_indices[i][j] = 1; 
 	}
       }
-      if(radius*radius>dist){
+      if(radius*radius>=dist){
 	if(!isnan(inside_V)){
 	  mesh[i][j] = inside_V;
 	  fixed_indices[i][j] = 1;
@@ -260,23 +260,46 @@ double eBoundarySolver::relaxPotential_J(double del, int max_iter){
                     double y_before = j == 0 ? original_potential[i][j] : original_potential[i][j-1];
                     double y_after = j == cols - 1 ? original_potential[i][j] : original_potential[i][j+1]; 
 		    
-		    if(fixed_indices[i][j]==1){
+		    if(fixed_indices[i][j]==0){
 		      mesh[i][j] = 1/(2 *(1 + alpha) ) 
 			* ( x_before + x_after + alpha*(y_before + y_after) );
 		    }
+
 		    if(fixed_indices[i][j]==2){
-		      x_before = isnan(boundaries[i][j][4]) ? x_before : boundaries[i][j][4];
-		      x_after = isnan(boundaries[i][j][0]) ? x_after : boundaries[i][j][0];
-		      y_before = isnan(boundaries[i][j][6]) ? y_before : boundaries[i][j][6];
-		      y_after = isnan(boundaries[i][j][2]) ? y_after : boundaries[i][j][2];
-		      double hx_after = isnan(boundaries[i][j][0]) ? hx : boundaries[i][j][1];
-		      double hx_before = isnan(boundaries[i][j][4]) ? hx : boundaries[i][j][5];
-		      double hy_after = isnan(boundaries[i][j][2]) ? hy : boundaries[i][j][3];
-		      double hy_before = isnan(boundaries[i][j][6]) ? hy : boundaries[i][j][7];
-		      mesh[i][j] = (x_before*hx_after + x_after*hx_before)/
-			(hx_after + hx_before) +
-			(y_before*hy_after + y_after*hy_before)/
-			(hy_after + hy_before);
+		      double hx_after, hx_before, hy_after, hy_before;
+		      if(!isnan(boundaries[i][j][4])){
+			hx_before = boundaries[i][j][4] * hx;
+			x_before = boundaries[i][j][5];
+		      }
+		      else{
+			hx_before = hx;
+		      }
+		      if(!isnan(boundaries[i][j][0])){
+			hx_after = boundaries[i][j][0] * hx;
+			x_after = boundaries[i][j][1];
+		      }
+		      else{
+			hx_after = hx;
+		      }
+		      if(!isnan(boundaries[i][j][6])){
+			hy_before = boundaries[i][j][6] * hy;
+			y_before = boundaries[i][j][7];
+		      }
+		      else{
+			hy_before = hy;
+		      }
+		      if(!isnan(boundaries[i][j][2])){
+			hy_after = boundaries[i][j][2] * hy;
+			y_after = boundaries[i][j][3];
+		      }
+		      else{
+			hy_after = hy;
+		      }
+
+		      mesh[i][j] = ((x_before*hx_after + x_after*hx_before)/
+				(hx_after + hx_before) * hy_after * hy_before +
+			        (y_before*hy_after + y_after*hy_before)/	 			    (hy_after + hy_before) * hx_after * hx_before) /
+			(hx_after * hx_before + hy_after * hy_before);
 		    }
                     double difference = mesh[i][j] - original_potential[i][j];
                     change += difference * difference; // add difference squared
