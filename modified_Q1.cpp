@@ -13,42 +13,22 @@ int main(){
 
     int rows = 100, cols = 100;
 
-    eBoundarySolver Q1(rows, cols);
-    /*
-    //Set parameters for circle method
-    map<string,double> outer_circle_params ={
-        {"INSIDE", 0},
-        {"BOUNDARY", 1.5},
-        {"OUTSIDE", 1.5}
-    };
+    eBoundarySolver Q1_J(rows, cols);
+    Q1_J.circle(50,50,45,nan(""),1.5,1.5);
+    Q1_J.circle(50,50,25,0,0,nan(""));
+    Q1_J.relaxPotential_J(10e-10, 100000);
+    Q1_J.save_to_csv("Q1_J");
 
-    map<string,bool> outer_circle_fix_dict = {
-        {"INSIDE", false},
-        {"BOUNDARY", true},
-        {"OUTSIDE", true}
-    };
-    */
-    Q1.circle(50,50,45,nan(""),1.5,1.5);
+    eBoundarySolver Q1_GS(rows, cols);
+    Q1_GS.circle(50,50,45,nan(""),1.5,1.5);
+    Q1_GS.circle(50,50,25,0,0,nan(""));
+    Q1_GS.relaxPotential_GS(10e-10, 100000);
+    Q1_GS.save_to_csv("Q1_GS");
 
-    /*
-    map<string,double> inner_circle_params ={
-        {"INSIDE", 0},
-        {"BOUNDARY", 0},
-        {"OUTSIDE", 0}
-    };
-
-    map<string,bool> inner_circle_fix_dict = {
-        {"INSIDE", true},
-        {"BOUNDARY", true},
-        {"OUTSIDE", false}
-    };
-    */
-    Q1.circle(50,50,25,0,0,nan(""));
-
-
-    Q1.relaxPotential_J(10e-10, 100000);
-
-    Q1.save_to_csv("Q1");
-
+    eBoundarySolver Q1_SOR(rows, cols);
+    Q1_SOR.circle(50,50,45,nan(""),1.5,1.5);
+    Q1_SOR.circle(50,50,25,0,0,nan(""));
+    Q1_SOR.relaxPotential_SOR(10e-10, 100000);
+    Q1_SOR.save_to_csv("Q1_SOR");
     return 0;
 }

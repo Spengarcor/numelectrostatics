@@ -12,8 +12,6 @@
 
 using namespace std;
 
-
-
 //////////////////////////////////////////
 //             Constructors             //
 //////////////////////////////////////////
@@ -344,6 +342,7 @@ double eBoundarySolver::relaxPotential_GS(double del, int max_iter){
 
     while(change > del && iter_count < max_iter){
 
+
         //Initialise change as will keep a running total for each mesh point
         change = 0;
 
@@ -352,7 +351,7 @@ double eBoundarySolver::relaxPotential_GS(double del, int max_iter){
             for(int j = 0; j != cols; ++j){
             
                 
-                if(fixed_indices[i][j]){
+                if(fixed_indices[i][j]==1){
 
                     continue;
 
@@ -369,10 +368,48 @@ double eBoundarySolver::relaxPotential_GS(double del, int max_iter){
                     double y_before = j == 0 ? mesh[i][j] : mesh[i][j-1];
                     double y_after = j == cols - 1 ? mesh[i][j] : mesh[i][j+1]; 
 
-                    mesh[i][j] = 1/(2 *(1 + alpha) ) 
-                             * ( x_before + x_after + alpha*(y_before + y_after) );
+		    if(fixed_indices[i][j]==0){
+		      mesh[i][j] = 1/(2 *(1 + alpha) ) 
+			* ( x_before + x_after + alpha*(y_before + y_after) );
+		    }
 
-                    
+		    if(fixed_indices[i][j]==2){
+		      double hx_after, hx_before, hy_after, hy_before;
+		      if(!isnan(boundaries[i][j][4])){
+			hx_before = boundaries[i][j][4] * hx;
+			x_before = boundaries[i][j][5];
+		      }
+		      else{
+			hx_before = hx;
+		      }
+		      if(!isnan(boundaries[i][j][0])){
+			hx_after = boundaries[i][j][0] * hx;
+			x_after = boundaries[i][j][1];
+		      }
+		      else{
+			hx_after = hx;
+		      }
+		      if(!isnan(boundaries[i][j][6])){
+			hy_before = boundaries[i][j][6] * hy;
+			y_before = boundaries[i][j][7];
+		      }
+		      else{
+			hy_before = hy;
+		      }
+		      if(!isnan(boundaries[i][j][2])){
+			hy_after = boundaries[i][j][2] * hy;
+			y_after = boundaries[i][j][3];
+		      }
+		      else{
+			hy_after = hy;
+		      }
+
+		      mesh[i][j] = ((x_before*hx_after + x_after*hx_before)/
+				(hx_after + hx_before) * hy_after * hy_before +
+			        (y_before*hy_after + y_after*hy_before)/	 			    (hy_after + hy_before) * hx_after * hx_before) /
+			(hx_after * hx_before + hy_after * hy_before);
+		    }
+
 
                     double difference = mesh[i][j] - original_potential;
                     change += difference * difference; // add difference squared
@@ -427,7 +464,7 @@ double eBoundarySolver::relaxPotential_SOR(double del, int max_iter){
             for(int j = 0; j != cols; ++j){
             
                 
-                if(fixed_indices[i][j]){
+                if(fixed_indices[i][j]==1){
 
                     continue;
 
@@ -444,11 +481,52 @@ double eBoundarySolver::relaxPotential_SOR(double del, int max_iter){
                     double y_before = j == 0 ? mesh[i][j] : mesh[i][j-1];
                     double y_after = j == cols - 1 ? mesh[i][j] : mesh[i][j+1]; 
 
-                    double average_potential = 1/(2 *(1 + alpha) ) 
-                             * ( x_before + x_after + alpha*(y_before + y_after) );
+                    double average_potential;
+
+
+		    if(fixed_indices[i][j]==0){
+		      average_potential = 1/(2 *(1 + alpha) ) 
+			* ( x_before + x_after + alpha*(y_before + y_after) );
+		    }
+
+		    if(fixed_indices[i][j]==2){
+		      double hx_after, hx_before, hy_after, hy_before;
+		      if(!isnan(boundaries[i][j][4])){
+			hx_before = boundaries[i][j][4] * hx;
+			x_before = boundaries[i][j][5];
+		      }
+		      else{
+			hx_before = hx;
+		      }
+		      if(!isnan(boundaries[i][j][0])){
+			hx_after = boundaries[i][j][0] * hx;
+			x_after = boundaries[i][j][1];
+		      }
+		      else{
+			hx_after = hx;
+		      }
+		      if(!isnan(boundaries[i][j][6])){
+			hy_before = boundaries[i][j][6] * hy;
+			y_before = boundaries[i][j][7];
+		      }
+		      else{
+			hy_before = hy;
+		      }
+		      if(!isnan(boundaries[i][j][2])){
+			hy_after = boundaries[i][j][2] * hy;
+			y_after = boundaries[i][j][3];
+		      }
+		      else{
+			hy_after = hy;
+		      }
+
+		      average_potential = ((x_before*hx_after + x_after*hx_before)/
+				(hx_after + hx_before) * hy_after * hy_before +
+			        (y_before*hy_after + y_after*hy_before)/	 			    (hy_after + hy_before) * hx_after * hx_before) /
+			(hx_after * hx_before + hy_after * hy_before);
+		    }
 
                     mesh[i][j] = one_minus_omega * mesh[i][j] + omega * average_potential;
-
                     double difference = mesh[i][j] - original_potential;
                     change += difference * difference; // add difference squared
 
