@@ -119,7 +119,7 @@ void eBoundarySolver::circle(int centre_x, int centre_y, double radius,
       
       // checking if a point is in or out the circle from the equation
       // of a circle
-      if(radius*radius<dist){
+      if(radius*radius<=dist){
 	if(!isnan(outside_V)){
 	  mesh[i][j] = outside_V; 
 	  fixed_indices[i][j] = 1; 
@@ -138,10 +138,10 @@ void eBoundarySolver::circle(int centre_x, int centre_y, double radius,
       if(fabs(sqrt(dist)-radius)<sqrt(2)){
 	
 	// if the circle crosses a grid line within 0.5 from the point
-	double d_y = fabs(j-centre_y)
-	             - sqrt(fabs(radius*radius-(centre_x-i)*(centre_x-i)));
-	double d_x = fabs(i-centre_x)
-	             - sqrt(fabs(radius*radius-(centre_y-j)*(centre_y-j)));
+	double d_y = fabs(double(j-centre_y))
+	  - sqrt(radius*radius-double((centre_x-i)*(centre_x-i)));
+	double d_x = fabs(double(i-centre_x))
+	  - sqrt(radius*radius-double((centre_y-j)*(centre_y-j)));
 
 	if(fabs(d_x)<1){
 	  if(i>centre_x){
@@ -196,10 +196,12 @@ void eBoundarySolver::change_boundary(int i, int j, int dir,
     dis - new h for differentiation
     V - boundary potential
    */
-  fixed_indices[i][j] = 2;
-  if(isnan(boundaries[i][j][dir*2] || boundaries[i][j][dir*2]>dis)){
-    boundaries[i][j][dir*2] = dis;
-    boundaries[i][j][dir*2+1] = V;
+  if(fixed_indices[i][j]!=1){
+    fixed_indices[i][j] = 2;
+    if(isnan(boundaries[i][j][dir*2] || boundaries[i][j][dir*2]>dis)){
+      boundaries[i][j][dir*2] = dis;
+      boundaries[i][j][dir*2+1] = V;
+    }
   }
 }
 
@@ -266,32 +268,32 @@ double eBoundarySolver::relaxPotential_J(double del, int max_iter){
 		    if(fixed_indices[i][j]==2){
 		      double hx_after, hx_before, hy_after, hy_before;
 		      if(!isnan(boundaries[i][j][4])){
-			hx_before = boundaries[i][j][4] * hx;
+			hx_before = boundaries[i][j][4];
 			x_before = boundaries[i][j][5];
 		      }
 		      else{
-			hx_before = hx;
+			hx_before = 1;
 		      }
 		      if(!isnan(boundaries[i][j][0])){
-			hx_after = boundaries[i][j][0] * hx;
+			hx_after = boundaries[i][j][0];
 			x_after = boundaries[i][j][1];
 		      }
 		      else{
-			hx_after = hx;
+			hx_after = 1;
 		      }
 		      if(!isnan(boundaries[i][j][6])){
-			hy_before = boundaries[i][j][6] * hy;
+			hy_before = boundaries[i][j][6];
 			y_before = boundaries[i][j][7];
 		      }
 		      else{
-			hy_before = hy;
+			hy_before = 1;
 		      }
 		      if(!isnan(boundaries[i][j][2])){
-			hy_after = boundaries[i][j][2] * hy;
+			hy_after = boundaries[i][j][2];
 			y_after = boundaries[i][j][3];
 		      }
 		      else{
-			hy_after = hy;
+			hy_after = 1;
 		      }
 
 		      mesh[i][j] = ((x_before*hx_after + x_after*hx_before)/
@@ -376,37 +378,38 @@ double eBoundarySolver::relaxPotential_GS(double del, int max_iter){
 		    if(fixed_indices[i][j]==2){
 		      double hx_after, hx_before, hy_after, hy_before;
 		      if(!isnan(boundaries[i][j][4])){
-			hx_before = boundaries[i][j][4] * hx;
+			hx_before = boundaries[i][j][4];
 			x_before = boundaries[i][j][5];
 		      }
 		      else{
-			hx_before = hx;
+			hx_before = 1;
 		      }
 		      if(!isnan(boundaries[i][j][0])){
-			hx_after = boundaries[i][j][0] * hx;
+			hx_after = boundaries[i][j][0];
 			x_after = boundaries[i][j][1];
 		      }
 		      else{
-			hx_after = hx;
+			hx_after = 1;
 		      }
 		      if(!isnan(boundaries[i][j][6])){
-			hy_before = boundaries[i][j][6] * hy;
+			hy_before = boundaries[i][j][6];
 			y_before = boundaries[i][j][7];
 		      }
 		      else{
-			hy_before = hy;
+			hy_before = 1;
 		      }
 		      if(!isnan(boundaries[i][j][2])){
-			hy_after = boundaries[i][j][2] * hy;
+			hy_after = boundaries[i][j][2];
 			y_after = boundaries[i][j][3];
 		      }
 		      else{
-			hy_after = hy;
+			hy_after = 1;
 		      }
 
 		      mesh[i][j] = ((x_before*hx_after + x_after*hx_before)/
 				(hx_after + hx_before) * hy_after * hy_before +
-			        (y_before*hy_after + y_after*hy_before)/	 			    (hy_after + hy_before) * hx_after * hx_before) /
+			        (y_before*hy_after + y_after*hy_before)/
+				(hy_after + hy_before) * hx_after * hx_before) /
 			(hx_after * hx_before + hy_after * hy_before);
 		    }
 
@@ -492,32 +495,32 @@ double eBoundarySolver::relaxPotential_SOR(double del, int max_iter){
 		    if(fixed_indices[i][j]==2){
 		      double hx_after, hx_before, hy_after, hy_before;
 		      if(!isnan(boundaries[i][j][4])){
-			hx_before = boundaries[i][j][4] * hx;
+			hx_before = boundaries[i][j][4];
 			x_before = boundaries[i][j][5];
 		      }
 		      else{
-			hx_before = hx;
+			hx_before = 1;
 		      }
 		      if(!isnan(boundaries[i][j][0])){
-			hx_after = boundaries[i][j][0] * hx;
+			hx_after = boundaries[i][j][0];
 			x_after = boundaries[i][j][1];
 		      }
 		      else{
-			hx_after = hx;
+			hx_after = 1;
 		      }
 		      if(!isnan(boundaries[i][j][6])){
-			hy_before = boundaries[i][j][6] * hy;
+			hy_before = boundaries[i][j][6];
 			y_before = boundaries[i][j][7];
 		      }
 		      else{
-			hy_before = hy;
+			hy_before = 1;
 		      }
 		      if(!isnan(boundaries[i][j][2])){
-			hy_after = boundaries[i][j][2] * hy;
+			hy_after = boundaries[i][j][2];
 			y_after = boundaries[i][j][3];
 		      }
 		      else{
-			hy_after = hy;
+			hy_after = 1;
 		      }
 
 		      average_potential = ((x_before*hx_after + x_after*hx_before)/
