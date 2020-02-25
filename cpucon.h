@@ -18,7 +18,7 @@
 //const int num_CPU_states = 10;
 
 //Using enum to number each CPU state from 0-10 for easier referencing in functions
-enum CPUStates {
+/*enum CPUstates {
 
         S_USER = 0,
         S_NICE,
@@ -31,28 +31,30 @@ enum CPUStates {
         S_GUEST,
         S_GUEST_NICE
 
-}; //Why ;?
+};*/ //Why ;? 
 
 //declaring structure of data type for our CPUdata objects
 typedef struct CPUdata {
-	std::string cpu; //to read string of CPU data from each line of /proc/stat
-	size_t times[10/*num_CPU_states*/]; //declaring array of size 10 to store CPU state times of each CPU and total
+	std::string cpu; //to read CPU name
+	size_t times[11]; //declaring array of size 11 to store CPU name and 10 CPU times
 
 	//size_t is type able to represent largest size of any object in bytes, basically just unsigned (can never be negative) better version of signed (can be both positive and negative) int
-} CPUData;
+} CPUdata;
 
 //reads in CPU time at two snapshots from /proc/stat
 struct Read {
-	void ReadCPUdata(std::vector<CPUData> & entries);
+
+	void ReadCPUdata(std::vector<CPUdata> & entries);
+
 };
 
 //saves CPU consumption and CPU time iteratively to CSV file for each number of iterations in numerical solver
 struct Save {
 		
-	size_t TimeIdle(const CPUData & e); 
-	size_t TimeActive(const CPUData & e);	
+	size_t TimeIdle(const CPUdata & e); 
+	size_t TimeActive(const CPUdata & e);	
 	
-	void SaveCPUdata(const std::vector<CPUData> & snapshot1, const std::vector<CPUData> & snapshot2/*, const size_t n*/);	
+	void SaveCPUdata(const std::vector<CPUdata> & snapshot1, const std::vector<CPUdata> & snapshot2, const size_t n);	
 };
 
 #endif		
