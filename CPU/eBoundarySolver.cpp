@@ -8,9 +8,11 @@
 #include <tuple>
 #include <fstream>
 #include <climits>
-#include "modified_eBS.h"
+#include "eBoundarySolver.h"
 
 using namespace std;
+
+
 
 //////////////////////////////////////////
 //             Constructors             //
@@ -21,15 +23,10 @@ eBoundarySolver::eBoundarySolver(int rows_in, int cols_in){
     rows = rows_in; cols = cols_in;
 
     vector<vector<double>> blank_mesh(rows, vector<double>(cols, 0));
-    vector<vector<int>> blank_fixed_indices(rows, vector<int>(cols, 0));
-    vector<vector<vector<double>>> blank_boundaries(rows,
-						    vector<vector<double>>( 
-						    cols,
-						    vector<double>(8,nan(""))));
+    vector<vector<bool>> blank_fixed_indices(rows, vector<bool>(cols, false));
 
     mesh = blank_mesh;
     fixed_indices = blank_fixed_indices;
-    boundaries = blank_boundaries;
 
 }
 
@@ -38,7 +35,7 @@ eBoundarySolver::eBoundarySolver(int rows_in, int cols_in){
 //       Boundary Drawing Methods       //
 //////////////////////////////////////////
 
-void eBoundarySolver::single_point(tuple<int,int,double> point, bool fixed ){
+void eBoundarySolver::single_point(tuple<int,int,double> point, bool fixed){
     /*
         Requires input of a tuple where:
 
@@ -56,20 +53,15 @@ void eBoundarySolver::single_point(tuple<int,int,double> point, bool fixed ){
         double potential = get<2>(point);
 
         mesh[x_coord][y_coord] = potential;
-	if(fixed){
-	  fixed_indices[x_coord][y_coord] = 1;
-	}
-	else{
-	  fixed_indices[x_coord][y_coord] = 0;
-	}
+        fixed_indices[x_coord][y_coord] = fixed;
 
 }
 
 
 
 
-void eBoundarySolver::rectangle(int corner_x, int corner_y, int length_x,
-				int length_y, double V){
+void eBoundarySolver::rectangle(int corner_x, int corner_y, int length_x, int length_y,
+			float V){
   /*
     Draw a boundary rectangle with fixed values inside and on the edges,
     its edges parallel to the grid-lines
@@ -102,111 +94,50 @@ void eBoundarySolver::rectangle(int corner_x, int corner_y, int length_x,
   for(int i=0;i<length_x;i++){
     for(int j=0;j<length_y;j++){
 	      mesh[corner_x+i][corner_y+j]=V;
-	      fixed_indices[corner_x+i][corner_y+j]=1;
+	      fixed_indices[corner_x+i][corner_y+j]=true;
     }
   }
 
 }
 
 
-void eBoundarySolver::circle(int centre_x, int centre_y, double radius,
-			     double inside_V, double boundary_V,
-			     double outside_V){
-  
+void eBoundarySolver::circle(int centre_x, int centre_y, float radius, map<string,double> params, map<string,bool> fix_dict){
+
   for(int i = 0; i != rows-1; i++){
     for(int j = 0; j != cols-1; j++){
       float dist{(i-centre_x)*(i-centre_x) + (j-centre_y)*(j-centre_y)};
-      
-      // checking if a point is in or out the circle from the equation
-      // of a circle
-      if(radius*radius<=dist){
-	if(!isnan(outside_V)){
-	  mesh[i][j] = outside_V; 
-	  fixed_indices[i][j] = 1; 
-	}
-      }
-      if(radius*radius>=dist){
-	if(!isnan(inside_V)){
-	  mesh[i][j] = inside_V;
-	  fixed_indices[i][j] = 1;
-	}
-      }
-      // a third condition for points exactly on the boundary could be added
-      // if the difference is smaller than some accuracy limit
 
-      // So to avoid checking every point for a boundary
-      if(fabs(sqrt(dist)-radius)<sqrt(2)){
-	
-	// if the circle crosses a grid line within 0.5 from the point
-	double d_y = fabs(double(j-centre_y))
-	  - sqrt(radius*radius-double((centre_x-i)*(centre_x-i)));
-	double d_x = fabs(double(i-centre_x))
-	  - sqrt(radius*radius-double((centre_y-j)*(centre_y-j)));
+        // checking if a point is in the circle from the equation of a circle
+        if(radius*radius<dist){
+            if(fix_dict["OUTSIDE"]){
+    	        mesh[i][j] = params["OUTSIDE"]; 
+                fixed_indices[i][j] = true; 
+            }
+        }
+        else{
+            if(fix_dict["INSIDE"]){
+                mesh[i][j] = params["INSIDE"];
+                fixed_indices[i][j] = true;
+            }
+        }
 
-	if(fabs(d_x)<0.01 || fabs(d_y)<0.01){
-	  fixed_indices[i][j]=1;
-	  mesh[i][j]=boundary_V;
-	} else{
-	if(fabs(d_x)<1){
-	  if(i>centre_x){
-	    if(d_x<0){ //positive x
-	      change_boundary(i, j, 0, fabs(d_x), boundary_V);
-	    }
-	    if(d_x>0){ //negative x
-	      change_boundary(i, j, 2, fabs(d_x), boundary_V);
-	    }
-	  }
-	  if(i<centre_x){
-	    if(d_x<0){ //negative x
-	      change_boundary(i, j, 2, fabs(d_x), boundary_V);
-	    }
-	    if(d_x>0){ //poasitive x
-	      change_boundary(i, j, 0, fabs(d_x), boundary_V);
-	    }
-	  }
-	}
-	if(fabs(d_y)<1){
-	  if(j>centre_y){
-	    if(d_y<0){ //positive y
-	      change_boundary(i, j, 1, fabs(d_y), boundary_V);
-	    }
-	    if(d_y>0){ //negative y
-	      change_boundary(i, j, 3, fabs(d_y), boundary_V);
-	    }
-	  }
-	  if(j<centre_y){
-	    if(d_y<0){ //negative y
-	      change_boundary(i, j, 3, fabs(d_y), boundary_V);
-	    }
-	    if(d_y>0){ //positive y
-	      change_boundary(i, j, 1, fabs(d_y), boundary_V);
-	    }
-	  }
-	}
-      }
+
+        // So to avoid checking every point for a boundary
+        if(fabs(sqrt(dist)-radius)<sqrt(2)){
+
+	      // if the circle crosses a grid line within 0.5 from the point
+	      if(fabs(sqrt(fabs(radius*radius-(centre_x-i)*(centre_x-1)))
+	      	     -fabs(j-centre_y))
+	         <=0.5 || 
+	         fabs(sqrt(fabs(radius*radius-(centre_y-j)*(centre_y-j)))-
+	      	fabs(i-centre_x))
+	         <=0.5){
+      	    mesh[i][j] = params["BOUNDARY"];
+            fixed_indices[i][j] = true;
+	        }
+        }
     }
-  }
-}
-}
-
-void eBoundarySolver::change_boundary(int i, int j, int dir,
-				      double dis, double V){
-  /*
-    i, j - indices as in grid
-    dir - direction: 0 - x positive
-                     1 - y positive
-                     2 - x negative
-                     3 - y negative
-    dis - new h for differentiation
-    V - boundary potential
-   */
-  if(fixed_indices[i][j]!=1){
-    fixed_indices[i][j] = 2;
-    if(isnan(boundaries[i][j][dir*2] || boundaries[i][j][dir*2]>dis)){
-      boundaries[i][j][dir*2] = dis;
-      boundaries[i][j][dir*2+1] = V;
-    }
-  }
+ }
 }
 
 
@@ -214,7 +145,7 @@ void eBoundarySolver::change_boundary(int i, int j, int dir,
 //          Relaxation Methods          //
 //////////////////////////////////////////
 
-double eBoundarySolver::relaxPotential_J(double del, int max_iter){
+double eBoundarySolver::relaxPotential_J(int iters){
 
      /*
         An implementation of the Jacobi method for relaxaing an ODE
@@ -237,7 +168,7 @@ double eBoundarySolver::relaxPotential_J(double del, int max_iter){
 
     vector<vector<double>> original_potential = mesh;
 
-    while(change > del && iter_count < max_iter){
+    while(iter_count != iters){
 
         //Initialise change as will keep a running total for each mesh point
         change = 0;
@@ -249,12 +180,11 @@ double eBoundarySolver::relaxPotential_J(double del, int max_iter){
             for(int j = 0; j != cols; ++j){
             
                 
-                if(fixed_indices[i][j]==1){
+                if(fixed_indices[i][j]){
 
                     continue;
 
-                }
-		else {
+                } else {
 
 
                     //Basic handling of non-boundary edges
@@ -263,48 +193,12 @@ double eBoundarySolver::relaxPotential_J(double del, int max_iter){
                     double x_after = i == rows - 1 ? original_potential[i][j] : original_potential[i+1][j];
                     double y_before = j == 0 ? original_potential[i][j] : original_potential[i][j-1];
                     double y_after = j == cols - 1 ? original_potential[i][j] : original_potential[i][j+1]; 
-		    
-		    if(fixed_indices[i][j]==0){
-		      mesh[i][j] = 1/(2 *(1 + alpha) ) 
-			* ( x_before + x_after + alpha*(y_before + y_after) );
-		    }
 
-		    if(fixed_indices[i][j]==2){
-		      double hx_after, hx_before, hy_after, hy_before;
-		      if(!isnan(boundaries[i][j][4])){
-			hx_before = boundaries[i][j][4];
-			x_before = boundaries[i][j][5];
-		      }
-		      else{
-			hx_before = 1;
-		      }
-		      if(!isnan(boundaries[i][j][0])){
-			hx_after = boundaries[i][j][0];
-			x_after = boundaries[i][j][1];
-		      }
-		      else{
-			hx_after = 1;
-		      }
-		      if(!isnan(boundaries[i][j][6])){
-			hy_before = boundaries[i][j][6];
-			y_before = boundaries[i][j][7];
-		      }
-		      else{
-			hy_before = 1;
-		      }
-		      if(!isnan(boundaries[i][j][2])){
-			hy_after = boundaries[i][j][2];
-			y_after = boundaries[i][j][3];
-		      }
-		      else{
-			hy_after = 1;
-		      }
+                    mesh[i][j] = 1/(2 *(1 + alpha) ) 
+                             * ( x_before + x_after + alpha*(y_before + y_after) );
 
-		      mesh[i][j] = ((x_before*hx_after + x_after*hx_before)/
-				(hx_after + hx_before) * hy_after * hy_before +
-			        (y_before*hy_after + y_after*hy_before)/	 			    (hy_after + hy_before) * hx_after * hx_before) /
-			(hx_after * hx_before + hy_after * hy_before);
-		    }
+                    
+
                     double difference = mesh[i][j] - original_potential[i][j];
                     change += difference * difference; // add difference squared
 
@@ -324,7 +218,7 @@ double eBoundarySolver::relaxPotential_J(double del, int max_iter){
 }
 
 
-double eBoundarySolver::relaxPotential_GS(double del, int max_iter){
+double eBoundarySolver::relaxPotential_GS(int iters){
 
      /*
         An implementation of the Gauss-Seidel method for relaxaing an ODE
@@ -346,8 +240,7 @@ double eBoundarySolver::relaxPotential_GS(double del, int max_iter){
 
 
 
-    while(change > del && iter_count < max_iter){
-
+    while(iter_count != iters){
 
         //Initialise change as will keep a running total for each mesh point
         change = 0;
@@ -357,7 +250,7 @@ double eBoundarySolver::relaxPotential_GS(double del, int max_iter){
             for(int j = 0; j != cols; ++j){
             
                 
-                if(fixed_indices[i][j]==1){
+                if(fixed_indices[i][j]){
 
                     continue;
 
@@ -374,49 +267,10 @@ double eBoundarySolver::relaxPotential_GS(double del, int max_iter){
                     double y_before = j == 0 ? mesh[i][j] : mesh[i][j-1];
                     double y_after = j == cols - 1 ? mesh[i][j] : mesh[i][j+1]; 
 
-		    if(fixed_indices[i][j]==0){
-		      mesh[i][j] = 1/(2 *(1 + alpha) ) 
-			* ( x_before + x_after + alpha*(y_before + y_after) );
-		    }
+                    mesh[i][j] = 1/(2 *(1 + alpha) ) 
+                             * ( x_before + x_after + alpha*(y_before + y_after) );
 
-		    if(fixed_indices[i][j]==2){
-		      double hx_after, hx_before, hy_after, hy_before;
-		      if(!isnan(boundaries[i][j][4])){
-			hx_before = boundaries[i][j][4];
-			x_before = boundaries[i][j][5];
-		      }
-		      else{
-			hx_before = 1;
-		      }
-		      if(!isnan(boundaries[i][j][0])){
-			hx_after = boundaries[i][j][0];
-			x_after = boundaries[i][j][1];
-		      }
-		      else{
-			hx_after = 1;
-		      }
-		      if(!isnan(boundaries[i][j][6])){
-			hy_before = boundaries[i][j][6];
-			y_before = boundaries[i][j][7];
-		      }
-		      else{
-			hy_before = 1;
-		      }
-		      if(!isnan(boundaries[i][j][2])){
-			hy_after = boundaries[i][j][2];
-			y_after = boundaries[i][j][3];
-		      }
-		      else{
-			hy_after = 1;
-		      }
-
-		      mesh[i][j] = ((x_before*hx_after + x_after*hx_before)/
-				(hx_after + hx_before) * hy_after * hy_before +
-			        (y_before*hy_after + y_after*hy_before)/
-				(hy_after + hy_before) * hx_after * hx_before) /
-			(hx_after * hx_before + hy_after * hy_before);
-		    }
-
+                    
 
                     double difference = mesh[i][j] - original_potential;
                     change += difference * difference; // add difference squared
@@ -436,7 +290,7 @@ double eBoundarySolver::relaxPotential_GS(double del, int max_iter){
 
 }
 
-double eBoundarySolver::relaxPotential_SOR(double del, int max_iter){
+double eBoundarySolver::relaxPotential_SOR(int iters){
 
      /*
         An implementation of the SOR method for relaxaing an ODE
@@ -461,7 +315,7 @@ double eBoundarySolver::relaxPotential_SOR(double del, int max_iter){
 
 
 
-    while(change > del && iter_count < max_iter){
+    while(iter_count != iters){
 
         //Initialise change as will keep a running total for each mesh point
         change = 0;
@@ -471,7 +325,7 @@ double eBoundarySolver::relaxPotential_SOR(double del, int max_iter){
             for(int j = 0; j != cols; ++j){
             
                 
-                if(fixed_indices[i][j]==1){
+                if(fixed_indices[i][j]){
 
                     continue;
 
@@ -488,52 +342,11 @@ double eBoundarySolver::relaxPotential_SOR(double del, int max_iter){
                     double y_before = j == 0 ? mesh[i][j] : mesh[i][j-1];
                     double y_after = j == cols - 1 ? mesh[i][j] : mesh[i][j+1]; 
 
-                    double average_potential;
-
-
-		    if(fixed_indices[i][j]==0){
-		      average_potential = 1/(2 *(1 + alpha) ) 
-			* ( x_before + x_after + alpha*(y_before + y_after) );
-		    }
-
-		    if(fixed_indices[i][j]==2){
-		      double hx_after, hx_before, hy_after, hy_before;
-		      if(!isnan(boundaries[i][j][4])){
-			hx_before = boundaries[i][j][4];
-			x_before = boundaries[i][j][5];
-		      }
-		      else{
-			hx_before = 1;
-		      }
-		      if(!isnan(boundaries[i][j][0])){
-			hx_after = boundaries[i][j][0];
-			x_after = boundaries[i][j][1];
-		      }
-		      else{
-			hx_after = 1;
-		      }
-		      if(!isnan(boundaries[i][j][6])){
-			hy_before = boundaries[i][j][6];
-			y_before = boundaries[i][j][7];
-		      }
-		      else{
-			hy_before = 1;
-		      }
-		      if(!isnan(boundaries[i][j][2])){
-			hy_after = boundaries[i][j][2];
-			y_after = boundaries[i][j][3];
-		      }
-		      else{
-			hy_after = 1;
-		      }
-
-		      average_potential = ((x_before*hx_after + x_after*hx_before)/
-				(hx_after + hx_before) * hy_after * hy_before +
-			        (y_before*hy_after + y_after*hy_before)/	 			    (hy_after + hy_before) * hx_after * hx_before) /
-			(hx_after * hx_before + hy_after * hy_before);
-		    }
+                    double average_potential = 1/(2 *(1 + alpha) ) 
+                             * ( x_before + x_after + alpha*(y_before + y_after) );
 
                     mesh[i][j] = one_minus_omega * mesh[i][j] + omega * average_potential;
+
                     double difference = mesh[i][j] - original_potential;
                     change += difference * difference; // add difference squared
 
