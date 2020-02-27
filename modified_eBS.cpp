@@ -143,6 +143,10 @@ void eBoundarySolver::circle(int centre_x, int centre_y, double radius,
 	double d_x = fabs(double(i-centre_x))
 	  - sqrt(radius*radius-double((centre_y-j)*(centre_y-j)));
 
+	if(fabs(d_x)<0.01 || fabs(d_y)<0.01){
+	  fixed_indices[i][j]=1;
+	  mesh[i][j]=boundary_V;
+	} else{
 	if(fabs(d_x)<1){
 	  if(i>centre_x){
 	    if(d_x<0){ //positive x
@@ -183,7 +187,7 @@ void eBoundarySolver::circle(int centre_x, int centre_y, double radius,
     }
   }
 }
-
+}
 
 void eBoundarySolver::change_boundary(int i, int j, int dir,
 				      double dis, double V){
