@@ -11,7 +11,6 @@
 #include "eBoundarySolver.h"
 #include <boost/python.hpp>
 
-
 using namespace std;
 
 
@@ -37,7 +36,7 @@ eBoundarySolver::eBoundarySolver(int rows_in, int cols_in){
 //       Boundary Drawing Methods       //
 //////////////////////////////////////////
 
-void eBoundarySolver::single_point(tuple<int,int,double> point, bool fixed){
+void eBoundarySolver::single_point(int point_x, int point_y , double charge, bool fixed){
     /*
         Requires input of a tuple where:
 
@@ -50,9 +49,9 @@ void eBoundarySolver::single_point(tuple<int,int,double> point, bool fixed){
     */
 
 
-        int x_coord = get<0>(point);
-        int y_coord = get<1>(point);
-        double potential = get<2>(point);
+        int x_coord = point_x;
+        int y_coord = point_y;
+        double potential = charge;
 
         mesh[x_coord][y_coord] = potential;
         fixed_indices[x_coord][y_coord] = fixed;
@@ -62,8 +61,7 @@ void eBoundarySolver::single_point(tuple<int,int,double> point, bool fixed){
 
 
 
-void eBoundarySolver::rectangle(int corner_x, int corner_y, int length_x, int length_y,
-			float V){
+void eBoundarySolver::rectangle(int corner_x, int corner_y, int length_x, int length_y,	float V){
   /*
     Draw a boundary rectangle with fixed values inside and on the edges,
     its edges parallel to the grid-lines
@@ -103,7 +101,7 @@ void eBoundarySolver::rectangle(int corner_x, int corner_y, int length_x, int le
 }
 
 
-void eBoundarySolver::circle(int centre_x, int centre_y, float radius, map<string,double> params, map<string,bool> fix_dict){
+void eBoundarySolver::circle(int centre_x, int centre_y, float radius, float inside, float boundary, float outside, bool inside_fix, bool boundary_fix, bool outside_fix){
 
   for(int i = 0; i != rows-1; i++){
     for(int j = 0; j != cols-1; j++){
@@ -111,14 +109,14 @@ void eBoundarySolver::circle(int centre_x, int centre_y, float radius, map<strin
 
         // checking if a point is in the circle from the equation of a circle
         if(radius*radius<dist){
-            if(fix_dict["OUTSIDE"]){
-    	        mesh[i][j] = params["OUTSIDE"]; 
+            if(outside_fix){
+    	        mesh[i][j] = outside; 
                 fixed_indices[i][j] = true; 
             }
         }
         else{
-            if(fix_dict["INSIDE"]){
-                mesh[i][j] = params["INSIDE"];
+            if(inside_fix){
+                mesh[i][j] = inside;
                 fixed_indices[i][j] = true;
             }
         }
@@ -134,7 +132,7 @@ void eBoundarySolver::circle(int centre_x, int centre_y, float radius, map<strin
 	         fabs(sqrt(fabs(radius*radius-(centre_y-j)*(centre_y-j)))-
 	      	fabs(i-centre_x))
 	         <=0.5){
-      	    mesh[i][j] = params["BOUNDARY"];
+      	    mesh[i][j] = boundary;
             fixed_indices[i][j] = true;
 	        }
         }

@@ -23,40 +23,155 @@ class Electrostatics(QTabWidget):
         #QMainWindow.__init__(self)
         super(Electrostatics, self).__init__(parent)
 
-        self.tab1 = QWidget(self)
-        self.addTab(self.tab1, "Tab 1")
-        self.figure = plt.figure(figsize=(10,5))
-        self.resize(400,400)
+        self.solver = eBoundarySolver(100,100)
+
+        self.window = QWidget(self)
+        #self.addTab(self.tab1, "Tab 1")
+        self.figure = plt.figure(figsize=(6,6))
+        self.resize(1400,900)
         self.canvas = FigureCanvas(self.figure)
         self.filepath = ""
 
-        layout = QVBoxLayout()
-        layout.addWidget(self.canvas)
-        self.tab1.setLayout(layout)
-
-        self.inputline = QLineEdit(self)
-
-
-        self.btn = QPushButton("Enter")
-        self.btn.clicked.connect(lambda:self.plot())
-        layout.addWidget(self.btn)
+        #layout = QVBoxLayout()
+        layout = QGridLayout(self.window)
+        layout.addWidget(self.canvas, 0, 0, 10, 10)
+        #self.window.setLayout(layout)
 
 
-    def initUI(self):
-        self.setWindowTitle(self.title)
-        self.setGeometry(self.left, self.top, self.width,self.height)
-        button = QPushButton("Click me", self)
-        button.setToolTip("Cheers")
-        button.move(100, 70)
-        self.show()
+        self.ptn_label = QLabel("Point")
+        self.ptn_x_label = QLabel("x-coord")
+        self.ptn_y_label = QLabel("y-coord")
+        self.ptn_V_label = QLabel("Charge")
+
+        self.point_x_input = QLineEdit(self)
+        self.point_y_input = QLineEdit(self)
+        self.point_V_input = QLineEdit(self)
+
+        self.point_btn = QPushButton("Add")
+        self.point_btn.clicked.connect(lambda:self.put_point())
+
+        layout.addWidget(self.ptn_label, 0, 14)
+        layout.addWidget(self.ptn_x_label, 1, 12)
+        layout.addWidget(self.ptn_y_label, 1, 14)
+        layout.addWidget(self.ptn_V_label, 3, 12)
+        layout.addWidget(self.point_x_input, 2, 12)
+        layout.addWidget(self.point_y_input, 2, 14)
+        layout.addWidget(self.point_V_input, 4, 12)
+        layout.addWidget(self.point_btn, 4, 14)
+
+
+        self.rec_label = QLabel("Rectangle")
+        self.rec_x_label = QLabel("Corner-x")
+        self.rec_y_label = QLabel("Corner-y")
+        self.rec_x_len_label = QLabel("x-Length")
+        self.rec_y_len_label = QLabel("y-Length")
+        self.rec_V_label = QLabel("Charge")
+
+        self.rec_x_input = QLineEdit(self)
+        self.rec_y_input = QLineEdit(self)
+        self.rec_x_len_input = QLineEdit(self)
+        self.rec_y_len_input = QLineEdit(self)
+        self.rec_V_input = QLineEdit(self)
+
+        self.rec_btn = QPushButton("Add")
+        self.rec_btn.clicked.connect(lambda:self.put_rectangle())
+
+        layout.addWidget(self.rec_label, 5, 14)
+        layout.addWidget(self.rec_x_label, 6, 12)
+        layout.addWidget(self.rec_y_label, 6, 14)
+        layout.addWidget(self.rec_x_len_label, 8, 12)
+        layout.addWidget(self.rec_y_len_label, 8, 14)
+        layout.addWidget(self.rec_V_label, 6, 16)
+        layout.addWidget(self.rec_x_input, 7, 12)
+        layout.addWidget(self.rec_y_input, 7, 14)
+        layout.addWidget(self.rec_x_len_input, 9, 12)
+        layout.addWidget(self.rec_y_len_input, 9, 14)
+        layout.addWidget(self.rec_V_input, 7, 16)
+        layout.addWidget(self.rec_btn, 9, 16)
+
+
+        self.crl_label = QLabel("Circle")
+        self.crl_x_label = QLabel("Centre-x")
+        self.crl_y_label = QLabel("Centre-y")
+        self.crl_r_label = QLabel("Radius")
+        self.crl_V_label = QLabel("Charge")
+
+        self.crl_x_input = QLineEdit(self)
+        self.crl_y_input = QLineEdit(self)
+        self.crl_r_input = QLineEdit(self)
+        self.crl_V_input = QLineEdit(self)
+
+        self.crl_btn = QPushButton("Add")
+        self.crl_btn.clicked.connect(lambda:self.put_circle())
+
+        layout.addWidget(self.crl_label, 13, 14)
+        layout.addWidget(self.crl_x_label, 15, 12)
+        layout.addWidget(self.crl_y_label, 15, 14)
+        layout.addWidget(self.crl_x_input, 16, 12)
+        layout.addWidget(self.crl_y_input, 16, 14)
+        layout.addWidget(self.crl_btn, 16, 16)
+        layout.addWidget(self.crl_r_label, 17, 12)
+        layout.addWidget(self.crl_V_label, 17, 14)
+        layout.addWidget(self.crl_r_input, 18, 12)
+        layout.addWidget(self.crl_V_input, 18, 14)
+
+
+        self.clear_btn = QPushButton("Clear")
+        self.solve_btn = QPushButton("Solve")
+        self.solve_btn.clicked.connect(lambda:self.plot())
+        self.lbl1 = QLabel("")
+        self.lbl2 = QLabel("")
+
+        layout.addWidget(self.clear_btn, 11, 5)
+        layout.addWidget(self.lbl1, 12, 5)
+        layout.addWidget(self.solve_btn, 13, 5)
+        layout.addWidget(self.lbl2, 14, 5)
+
+
+    def put_circle(self):
+        x = int(self.crl_x_input.text())
+        y = int(self.crl_y_input.text())
+        r = int(self.crl_r_input.text())
+        charge = float(self.crl_V_input.text())
+        self.crl_x_input.setText("")
+        self.crl_y_input.setText("")
+        self.crl_r_input.setText("")
+        self.crl_V_input.setText("")
+        self.solver.circle(x, y, r, charge, charge, 0, True, True, False)
+
+    def put_rectangle(self):
+        x = int(self.rec_x_input.text())
+        y = int(self.rec_y_input.text())
+        x_len = int(self.rec_x_len_input.text())
+        y_len = int(self.rec_y_len_input.text())
+        charge = float(self.rec_V_input.text())
+        self.rec_x_input.setText("")
+        self.rec_y_input.setText("")
+        self.rec_x_len_input.setText("")
+        self.rec_y_len_input.setText("")
+        self.rec_V_input.setText("")
+        self.solver.rectangle(x, y, x_len, y_len, charge)
+
+
+    def put_point(self):
+        x = int(self.point_x_input.text())
+        y = int(self.point_y_input.text())
+        charge = float(self.point_V_input.text())
+        self.point_x_input.setText("")
+        self.point_y_input.setText("")
+        self.point_V_input.setText("")
+        self.solver.single_point(x, y, charge, True)
+
 
     def plot(self):
-        self.filepath = self.inputline.text()
         self.canvas.figure.clf()
+        self.solver.save_to_csv("temp")
+        self.filepath = "temp.csv"
         self.get_display()
         #ax = self.figure.add_subplot(111)
         #ax.plot(self.data, 'r-')
         self.create_grid()
+        self.solver.relaxPotential_SOR(1e-4, 100)
         self.show_scalar_field()
         self.show_field_lines()
         self.show_equipotential()
@@ -91,80 +206,21 @@ class Electrostatics(QTabWidget):
         dx, dy = np.gradient(self.data)
         dx = np.column_stack((dx[:,0], dx))
         dy = np.column_stack((dy[:,0], dy))
-        print(len(self.X))
-        print(len(self.Y[:-1]))
-        print(len(dx[0]))
-        print(len(dx))
+        #print(len(self.X))
+        #print(len(self.Y[:-1]))
+        #print(len(dx[0]))
+        #print(len(dx))
         plt.streamplot(self.X, self.Y[:-1], dy, dx, color='black')
 
-    def show_field_line(self):
-        graddata_x = []
-        graddata_y = []
-        for row in self.values:
-            gradrow = []
-            for x in range(1,len(row)-1):
-                gradrow.append(row[x+1] - row[x])
-            graddata_x.append(gradrow)
-
-        graddata_x = np.array(graddata_x)
-        graddata_x = np.column_stack((graddata_x.transpose()[0] , np.column_stack((graddata_x, graddata_x.transpose()[0]))))
-
-        for column in self.values.transpose():
-            gradrow = []
-            for y in range(1,len(column)-1):
-                gradrow.append(column[y+1] - column[y])
-            graddata_y.append(gradrow)
-
-        graddata_y = np.array(graddata_y)
-        graddata_y = np.column_stack((graddata_y.transpose()[0], np.column_stack((graddata_y, graddata_y.transpose()[0]))))
-        #plt.quiver(self.X[::10], self.Y[::10], graddata_x[::,10], graddata_y.transpose()[::,10])
-        #stream_points = np.array(zip(self.X, -self.Y))
-        #stream_points = np.array([self.X, -self.Y])
-        stream_points = []
-        for x in self.X[:-1]:
-            for y in self.Y[:-1]:
-                stream_points.append([x,y])
-        stream_points = np.array(stream_points)
-        #stream_points = np.dstack((self.X, self.Y[:-1]))[0][:-1]
-        print(stream_points)
-        #stream_points = np.array(zip(np.arange(0, len(self.X), .5), -np.arange(0, len(self.Y), .5)))
-
-        #print(len(self.X[:len(graddata_y.transpose())-1]))
-        #print(len(self.Y[:len(graddata_x)]))
-        #print(len(graddata_x[0]))
-        #print(len(graddata_x))
-
-        #plt.streamplot(self.X[:len(graddata_y.transpose())-1], self.Y[:len(graddata_x)], graddata_x, graddata_y.transpose(), start_points=stream_points, color="black", density=1)
-
-        #Y,X = np.mgrid[-10:10:.01, -10:10:.01]
-        #y,x = Y[:,0], X[0,:]
-        #U, V = Y**2, X**2
-        #stream_points = []
-        #for x in np.arange(-9,9,.5):
-        #    for y in -np.arange(-9,9,.5):
-        #        stream_points.append([x,y])
-        #stream_points = np.array(stream_points)
-        #print(stream_points)
-        #stream_points = np.dstack((np.arange(-9,9,.5), -np.arange(-9,9,.5)))
-        #plt.streamplot(x,y, U,V, start_points=stream_points, density=35)
-
-        #print(len(self.X))
-        #print(len(self.Y[:-2]))
-        #print(len(graddata_x))
-        #print(len(graddata_y))
-        #U, V = np.meshgrid(self.X, self.Y[:-1])
-        #plt.quiver(self.X[:-1], self.Y[:-2], graddata_x[:-1], graddata_y)
-        #skip = (slice(None,None,3))
-        #skip2 = (slice(None,None,3),slice(None,None,3))
-        #plt.quiver(self.X[skip], self.Y[:-1:10], graddata_x[skip2], graddata_y[skip2], scale=10, minshaft=10, color='black')
 
 
     def show_equipotential(self):
-        print("\n")
-        print(len(self.X))
-        print(len(self.Y))
-        print(len(self.values[0]))
-        print(len(self.values))
+        #print("\n")
+        #print(len(self.X))
+        #print(len(self.Y))
+        #eBoundaryPlotter.single_point(1,1,1)
+        #print(len(self.values[0]))
+        #print(len(self.values))
         plt.contour(self.X[:-1], self.Y[:-1], self.values, 15, colors="grey", linestyles="solid")
 
 
