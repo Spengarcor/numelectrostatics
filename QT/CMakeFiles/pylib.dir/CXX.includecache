@@ -6,7 +6,7 @@
 
 #IncludeRegexTransform: 
 
-/home/jhfm/Documents/numelectrostatics/eBoundarySolver.h
+/home/jhfm/Documents/numelectrostatics/eBoundarySolverLib.h
 vector
 -
 cmath
@@ -22,8 +22,6 @@ string
 tuple
 -
 fstream
--
-boost/tuple/tuple.hpp
 -
 
 /home/jhfm/Documents/numelectrostatics/eBoundarySolverLib.hpp
@@ -45,8 +43,8 @@ fstream
 -
 climits
 -
-eBoundarySolver.h
-/home/jhfm/Documents/numelectrostatics/eBoundarySolver.h
+eBoundarySolverLib.h
+/home/jhfm/Documents/numelectrostatics/eBoundarySolverLib.h
 boost/python.hpp
 -
 

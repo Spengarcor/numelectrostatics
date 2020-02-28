@@ -8,7 +8,7 @@
 #include <tuple>
 #include <fstream>
 #include <climits>
-#include "eBoundarySolver.h"
+#include "eBoundarySolverLib.h"
 #include <boost/python.hpp>
 
 using namespace std;
@@ -101,7 +101,7 @@ void eBoundarySolver::rectangle(int corner_x, int corner_y, int length_x, int le
 }
 
 
-void eBoundarySolver::circle(int centre_x, int centre_y, float radius, float inside, float boundary, float outside, bool inside_fix, bool boundary_fix, bool outside_fix){
+void eBoundarySolver::circle(int centre_x, int centre_y, float radius, double inside, double boundary, double outside, bool inside_fix, bool boundary_fix, bool outside_fix){
 
   for(int i = 0; i != rows-1; i++){
     for(int j = 0; j != cols-1; j++){
