@@ -143,7 +143,7 @@ void eBoundarySolver::circle(int centre_x, int centre_y, double radius,
 	double d_x = fabs(double(i-centre_x))
 	  - sqrt(radius*radius-double((centre_y-j)*(centre_y-j)));
 
-	if(fabs(d_x)<0.01 || fabs(d_y)<0.6){
+	if(fabs(d_x)<0.5 || fabs(d_y)<0.5){
 	  fixed_indices[i][j]=1;
 	  mesh[i][j]=boundary_V;
 	} else{
@@ -214,7 +214,7 @@ void eBoundarySolver::change_boundary(int i, int j, int dir,
 //          Relaxation Methods          //
 //////////////////////////////////////////
 
-double eBoundarySolver::relaxPotential_J(double del, int max_iter){
+double eBoundarySolver::relaxPotential_J(int max_iter){
 
      /*
         An implementation of the Jacobi method for relaxaing an ODE
@@ -237,7 +237,7 @@ double eBoundarySolver::relaxPotential_J(double del, int max_iter){
 
     vector<vector<double>> original_potential = mesh;
 
-    while(change > del && iter_count < max_iter){
+    while(iter_count < max_iter){
 
         //Initialise change as will keep a running total for each mesh point
         change = 0;
@@ -332,7 +332,7 @@ double eBoundarySolver::relaxPotential_J(double del, int max_iter){
 }
 
 
-double eBoundarySolver::relaxPotential_GS(double del, int max_iter){
+double eBoundarySolver::relaxPotential_GS(int max_iter){
 
      /*
         An implementation of the Gauss-Seidel method for relaxaing an ODE
@@ -354,7 +354,7 @@ double eBoundarySolver::relaxPotential_GS(double del, int max_iter){
 
 
 
-    while(change > del && iter_count < max_iter){
+    while(iter_count < max_iter){
 
 
         //Initialise change as will keep a running total for each mesh point
@@ -444,7 +444,7 @@ double eBoundarySolver::relaxPotential_GS(double del, int max_iter){
 
 }
 
-double eBoundarySolver::relaxPotential_SOR(double del, int max_iter){
+double eBoundarySolver::relaxPotential_SOR(int max_iter){
 
      /*
         An implementation of the SOR method for relaxaing an ODE
@@ -469,7 +469,7 @@ double eBoundarySolver::relaxPotential_SOR(double del, int max_iter){
 
 
 
-    while(change > del && iter_count < max_iter){
+    while(iter_count < max_iter){
 
         //Initialise change as will keep a running total for each mesh point
         change = 0;
