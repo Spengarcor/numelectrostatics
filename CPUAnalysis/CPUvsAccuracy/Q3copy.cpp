@@ -18,7 +18,7 @@ int main(){
     //Accuracy lower threshold  
     double a = 1;
 
-    for (int i=0; i<6; i++) {
+    for (int i=0; i<10; i++) {
     	a/=10;
     
     	//creating vector of user defined type CPUData      
@@ -46,7 +46,7 @@ int main(){
     	Q3.rectangle(710,450,150,100,0);
 
 
-    	Q3.relaxPotential_J(a, 100000);
+    	Q3.relaxPotential_SOR(a, 100000);
 
     	Q3.save_to_csv("Q3_SOR");
 
