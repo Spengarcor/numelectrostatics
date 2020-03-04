@@ -143,7 +143,7 @@ void eBoundarySolver::circle(int centre_x, int centre_y, double radius,
 	double d_x = fabs(double(i-centre_x))
 	  - sqrt(radius*radius-double((centre_y-j)*(centre_y-j)));
 
-	if(fabs(d_x)<0.5 || fabs(d_y)<0.5){
+	if(fabs(d_x)<0.3 || fabs(d_y)<0.3){
 	  fixed_indices[i][j]=1;
 	  mesh[i][j]=boundary_V;
 	} else{
