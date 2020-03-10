@@ -141,6 +141,7 @@ void eBoundarySolver::circle(int centre_x, int centre_y, float radius, double in
 }
 
 
+
 //////////////////////////////////////////
 //          Relaxation Methods          //
 //////////////////////////////////////////
@@ -159,7 +160,7 @@ double eBoundarySolver::relaxPotential_J(double del, int max_iter){
     //Need to know how big a change each step of relaxation causes 
     //so we can determine when to stop i.e. when diminished returns
     double change = (double) INT_MAX; 
-    int iter_count =0;
+    int iter_count = 0;
 
     //Values needed for equations
     double hx = 1 / (double)rows, hy = 1 / (double)cols;
@@ -232,11 +233,12 @@ double eBoundarySolver::relaxPotential_GS(double del, int max_iter){
     //Need to know how big a change each step of relaxation causes 
     //so we can determine when to stop i.e. when diminished returns
     double change = (double) INT_MAX; 
-    int iter_count =0;
+    int iter_count = 0;
 
     //Values needed for equations
     double hx = 1 / (double)rows, hy = 1 / (double)cols;
     double alpha = pow(hx/hy, 2);
+
 
 
 
@@ -262,10 +264,10 @@ double eBoundarySolver::relaxPotential_GS(double del, int max_iter){
 
                     //Basic handling of non-boundary edges
                     //For edges, just take the current value so the average is slightly weighted towards its current value
-                    double x_before = i == 0 ? mesh[i][j] : mesh[i-1][j];
-                    double x_after = i == rows - 1 ? mesh[i][j] : mesh[i+1][j];
-                    double y_before = j == 0 ? mesh[i][j] : mesh[i][j-1];
-                    double y_after = j == cols - 1 ? mesh[i][j] : mesh[i][j+1]; 
+                    double x_before = i == 0 ? lagInterpolate(0, i-1, j, 3) : mesh[i-1][j];
+                    double x_after = i == rows - 1 ? lagInterpolate(0, i-1, j, 3) : mesh[i+1][j];
+                    double y_before = j == 0 ? lagInterpolate(1, i, j-1, 3) : mesh[i][j-1];
+                    double y_after = j == cols - 1 ? lagInterpolate(1, i, j-1, 3) : mesh[i][j+1]; 
 
                     mesh[i][j] = 1/(2 *(1 + alpha) ) 
                              * ( x_before + x_after + alpha*(y_before + y_after) );
@@ -337,10 +339,10 @@ double eBoundarySolver::relaxPotential_SOR(double del, int max_iter){
 
                     //Basic handling of non-boundary edges
                     //For edges, just take the current value so the average is slightly weighted towards its current value
-                    double x_before = i == 0 ? mesh[i][j] : mesh[i-1][j];
-                    double x_after = i == rows - 1 ? mesh[i][j] : mesh[i+1][j];
-                    double y_before = j == 0 ? mesh[i][j] : mesh[i][j-1];
-                    double y_after = j == cols - 1 ? mesh[i][j] : mesh[i][j+1]; 
+                    double x_before = i == 0 ? lagInterpolate(0, i-1, j, 3) : mesh[i-1][j];
+                    double x_after = i == rows - 1 ? lagInterpolate(0, i-1, j, 3) : mesh[i+1][j];
+                    double y_before = j == 0 ? lagInterpolate(1, i, j-1, 3) : mesh[i][j-1];
+                    double y_after = j == cols - 1 ? lagInterpolate(1, i, j-1, 3) : mesh[i][j+1]; 
 
                     double average_potential = 1/(2 *(1 + alpha) ) 
                              * ( x_before + x_after + alpha*(y_before + y_after) );
@@ -349,7 +351,6 @@ double eBoundarySolver::relaxPotential_SOR(double del, int max_iter){
 
                     double difference = mesh[i][j] - original_potential;
                     change += difference * difference; // add difference squared
-
                 }
             }
         }
@@ -364,6 +365,44 @@ double eBoundarySolver::relaxPotential_SOR(double del, int max_iter){
     return change;
 
 }
+
+//////////////////////////////////////////
+//             Interpolation            //
+//////////////////////////////////////////
+
+
+//Use three points
+double eBoundarySolver::lagInterpolate(int axis, int x_coord, int y_coord, int num_points){
+
+    double zp = 0;
+
+    int coord = (axis == 0 ? x_coord : y_coord); 
+
+    //Need to ensure interpolation is in the correct direction
+    //Can be left or right and the sign of change determines this
+    int change = coord < 0 ? -1 : 1;
+
+    for(int i = coord - (change * num_points) ; i !=coord; i += change ){
+
+        double p = 0;
+
+        for( int j = coord - (change * num_points); j != coord; j += change){
+
+            if( i != j ) p *= (coord - j) / (i - j);
+            
+        }
+
+        int mesh_x = (axis == 0 ? i : x_coord);
+        int mesh_y = (axis == 1 ? i : y_coord);
+
+        zp += p * mesh[mesh_x][mesh_y];
+    }
+
+    return zp;
+
+}
+
+
 
 
 //////////////////////////////////////////
@@ -390,6 +429,6 @@ void eBoundarySolver::save_to_csv(string fname){
     }
 
     csv_file.close();
-}
 
+}	
 
