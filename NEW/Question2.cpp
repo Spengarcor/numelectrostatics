@@ -15,7 +15,8 @@ using namespace std;
 int main(){
 
     ofstream myfile;
-    myfile.open ("csv_data2.txt");
+    myfile.open ("q2_csv_data3.csv");
+
 
     for (int i=1; i<10; i++){
     
@@ -39,14 +40,13 @@ int main(){
             {"OUTSIDE", false}
         };
 
-        Q2.circle(25*i,25*i,10*i, inner_circle_params, inner_circle_fix_dict);
+        Q2.circle(25*i,25*i,20, inner_circle_params, inner_circle_fix_dict);
 
         Q2.relaxPotential_SOR(10e-5, 100000, false);
 
-
         Q2.save_to_csv("Q2_after_100k_GS");
 
-        vector<vector<double>> analytical_solution = Q2.analQ2(rows,cols,20, 10*i,25*i,25*i, i,cols-i);
+        vector<vector<double>> analytical_solution = Q2.analQ2(rows,cols,20, 20,25*i,25*i, i,cols-i);
 
         double err = Q2.get_abs_error(rows, cols, Q2.mesh, analytical_solution);
 
