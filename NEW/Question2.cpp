@@ -24,8 +24,8 @@ int main(){
         eBoundarySolver Q2(rows,cols);
 
 
-        Q2.rectangle(0,0,rows,1*i,20);
-        Q2.rectangle(0,cols-1*i,rows,1*i,-20);
+        Q2.rectangle(0,0,rows,i,20);
+        Q2.rectangle(0,cols-i,rows,i,-20);
 
         map<string,double> inner_circle_params ={
             {"INSIDE", 0},
@@ -41,7 +41,7 @@ int main(){
 
         Q2.circle(25*i,25*i,10*i, inner_circle_params, inner_circle_fix_dict);
 
-        Q2.relaxPotential_J(10e-10, 100000, false);
+        Q2.relaxPotential_SOR(10e-5, 100000, false);
 
 
         Q2.save_to_csv("Q2_after_100k_GS");
