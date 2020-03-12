@@ -353,10 +353,11 @@ double eBoundarySolver::relaxPotential_SOR(double del, int max_iter, bool interp
     int iter_count =0;
 
     //Values needed for equations
-    double hx = 1 / (double)rows, hy = 1 / (double)cols;
+    double hx = 1 / (double)50, hy = 1 / (double)50;
+    double hxq= 1 / (double)rows;
     double alpha = pow(hx/hy, 2);
 
-    double omega = 2/ ( 1 + sin(M_PI*hx) );
+    double omega = 2/ ( 1 + sin(M_PI*hxq) );
     double one_minus_omega = 1 - omega; 
 
 

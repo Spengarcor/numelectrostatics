@@ -11,7 +11,7 @@ using namespace std;
 int main(){
 
 
-        int rows = 500, cols = 500;
+        int rows = 100, cols = 100;
 
         eBoundarySolver Q1(rows, cols);
 
@@ -28,7 +28,7 @@ int main(){
             {"OUTSIDE", true}
         };
 
-        Q1.circle(250,250,225, outer_circle_params, outer_circle_fix_dict);
+        Q1.circle(50,50,80, outer_circle_params, outer_circle_fix_dict);
 
 
 
@@ -44,15 +44,17 @@ int main(){
             {"OUTSIDE", false}
         };
 
-        Q1.circle(250,250,50, inner_circle_params, inner_circle_fix_dict);
+        Q1.circle(50,50,10, inner_circle_params, inner_circle_fix_dict);
 
         Q1.relaxPotential_SOR(10e-10, 100000 , true);
 
-        vector<vector<double>> analytical_solution = Q1.analQ1();//PUT IN THINGS
+        vector<vector<double>> analytical_solution = Q1.analQ1(100,100,10,10,80,50,50);//PUT IN THINGS
 
         double err = Q1.get_abs_error(rows, cols, Q1.mesh, analytical_solution);
 
         //SAVE TO FILE
+
+        cout << err;
 
     return 0;
 }
