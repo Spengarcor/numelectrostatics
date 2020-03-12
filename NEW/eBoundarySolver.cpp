@@ -548,9 +548,9 @@ double eBoundarySolver::get_abs_error(int rows, int cols, vector<vector<double>>
   for(int i=0;i<rows;i++){
     for(int j=0;j<cols;j++){
       
-      
+      if(i%ratio == 0 && j%ratio == 0){
       err += std::abs(A[i][j]-B[i][j]);
-      
+      }
 
     }
   }

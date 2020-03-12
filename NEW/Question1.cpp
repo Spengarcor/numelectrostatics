@@ -10,8 +10,11 @@ using namespace std;
 
 int main(){
 
+    ofstream myfile;
+    myfile.open ("csv_data.txt");
 
-        int rows = 500, cols = 500;
+    for (double i=1.1; i<4; i+=0.1){
+        int rows = 50*i, cols = 50*i;
 
         eBoundarySolver Q1(rows, cols);
 
@@ -28,7 +31,7 @@ int main(){
             {"OUTSIDE", true}
         };
 
-        Q1.circle(250,250,225, outer_circle_params, outer_circle_fix_dict);
+        Q1.circle(25*i,25*i,22.5*i, outer_circle_params, outer_circle_fix_dict);
 
 
 
@@ -44,7 +47,7 @@ int main(){
             {"OUTSIDE", false}
         };
 
-        Q1.circle(250,250,50, inner_circle_params, inner_circle_fix_dict);
+        Q1.circle(25*i,25*i,5*i, inner_circle_params, inner_circle_fix_dict);
         
 
         Q1.relaxPotential_SOR(10e-5, 100000 , true);
@@ -53,7 +56,7 @@ int main(){
 
 
 
-        vector<vector<double>> analytical_solution = Q1.analQ1(500,500,10,50,225,250,250);//PUT IN THINGS
+        vector<vector<double>> analytical_solution = Q1.analQ1(50*i,50*i,10,5*i,22.5*i,25*i,25*i);//PUT IN THINGS
 
 
 
@@ -61,7 +64,9 @@ int main(){
 
         //SAVE TO FILE
 
-        cout << err;
-        
+        myfile << err << "," << 50*i*50*i << "," << "\n"; 
+    }
+    myfile.close();
+
     return 0;
 }
