@@ -548,9 +548,9 @@ double eBoundarySolver::get_abs_error(int rows, int cols, vector<vector<double>>
   for(int i=0;i<rows;i++){
     for(int j=0;j<cols;j++){
       
-      if(i%ratio == 0 && j%ratio == 0){
-        err += std::abs(A[i][j]-B[i][j]);
-      }
+      
+      err += std::abs(A[i][j]-B[i][j]);
+      
 
     }
   }
@@ -567,6 +567,34 @@ double eBoundarySolver::get_abs_error(int rows, int cols, vector<vector<double>>
 //             File Methods             //
 //////////////////////////////////////////
 
+void eBoundarySolver::save_to_csv(string fname){
+
+    ofstream csv_file;
+
+    int ratio = rows / 50; 
+
+    csv_file.open(fname + "ignore.csv");
+
+    for(int i = 0; i != rows; ++i){
+        for(int j = 0; j != cols; ++j){
+    
+            if(i%ratio == 0 && j%ratio == 0){
+              csv_file << mesh[i][j];
+
+              if(j != mesh.size()-1){
+                  csv_file << ";";
+              }
+            }
+
+        }
+        csv_file << "\n";
+    }
+
+    csv_file.close();
+
+}	
+
+/*
 void eBoundarySolver::save_to_csv(string fname){
 
     ofstream csv_file;
@@ -589,7 +617,7 @@ void eBoundarySolver::save_to_csv(string fname){
     csv_file.close();
 
 }	
-
+*/
 
 void eBoundarySolver::save_errors(int iters, double abs_error, double change){
 
